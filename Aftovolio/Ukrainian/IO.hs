@@ -42,7 +42,7 @@ import Control.DeepSeq
 generalF
  :: Int -- ^ A power of 10. The distance value is quoted by 10 in this power if the next ['Word8'] argument is not empty. The default one is 0. The right values are in the range [0..4].
  -> Int -- ^ A 'length' of the next argument here.
- -> [Word8] -- ^ A list of non-negative values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+ -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'

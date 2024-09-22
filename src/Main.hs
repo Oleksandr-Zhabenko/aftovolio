@@ -17,6 +17,7 @@ import Data.Tuple (snd)
 import Aftovolio.Ukrainian.PrepareText 
 import System.Environment (getArgs)
 import GHC.Int (Int8)
+import GHC.Word (Word8) 
 import CLI.Arguments
 import CLI.Arguments.Get
 import CLI.Arguments.Parsing
@@ -35,7 +36,7 @@ import Control.DeepSeq (force)
 main :: IO ()
 main = do
   args0 <- getArgs
-  let (argCBs, args) = parseHelp args0
+  let (argCBs, args) = parseHelp args0 -- Used for +b ... -b parsing that is done avoiding general scheme of cSpecs.
       (argsA, argsB, argsC, arg2s) = args2Args31R ('+','-') (aSpecs `mappend` bSpecs `mappend` cSpecs) args
       compareByLinesFinalFile = concat . getB "-cm" $ argsB
   if not . null $ compareByLinesFinalFile then do
@@ -108,7 +109,9 @@ main = do
     let line2comparewith 
           | oneC "+l2" argsC || null linecomp3 = unwords . getC "+l2" $ argsC
           | otherwise = linecomp3
-        basecomp = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . (if null fileDu then case sylD of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} 
+        basecomp 
+          | oneC "+ln" argsC = force . catMaybes . map (\xs -> readMaybe xs::Maybe Word8) . getC "+ln" $ argsC 
+          | otherwise = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . (if null fileDu then case sylD of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} 
                            else  if length syllableDurationsDs >= sylD then syllableDurationsDs !! (sylD - 1) else syllableDurationsD2) . createSyllablesUkrS) $ line2comparewith
  
         example = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . (if null fileDu then case sylD of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} 
@@ -146,7 +149,7 @@ aSpecs :: CLSpecifications
 aSpecs = zip ["+l", "+n","-p", "-C"] . cycle $ [0]
 
 cSpecs :: CLSpecifications
-cSpecs = [("+a",-1),("+l2",-1)]
+cSpecs = [("+a",-1),("+l2",-1),("+ln",-1)]
 
 helpPrint :: String -> IO ()
 helpPrint xs
@@ -158,6 +161,7 @@ helpPrint xs
   | xs == "5" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+m <FilePath> <num1> +m2 <num2>]]\n"
   | xs == "6" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+m3 <FilePath> <num1> <num2>]]\n"
   | xs == "7" = putStrLn "aftovolioUkr [-cm <FilePath to write the resulting combined output to> <FilePaths of the files to be compared and chosen the resulting options line-by-line>]\n"
+  | xs == "8" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of Word8 positive integer values not greater than 255 e. g. 24 54 57 159 45 39 to compare similarity with> -ln]] <Ukrainian textual line>\n"
   | xs == "OR" = putStrLn "OR:"
   | xs == "n" = putStrLn "+n \t— if specified then the order of sorting and printing is descending (the reverse one to the default otherwise). \n"
   | xs == "l" = putStrLn "+l \t— if specified then the output for one property (no tests) contains empty lines between the groups of the line option with the same value of property. \n"
@@ -170,6 +174,7 @@ helpPrint xs
   | xs == "a" = putStrLn "+a ... -a \t— if present contains a group of constraints for AFTOVolio. For more information, see: \nhttps://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#constraints in English or in Ukrainian: \nhttps://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Ukr.21.html#%D0%BE%D0%B1%D0%BC%D0%B5%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F-constraints\n"
   | xs == "b" = putStrLn "+b ... -b \t— if present takes precedence over those ones in the +a ... -a group (the latter ones have no effect). A group of constraints for AFTOVolio using some boolean-based algebra. If you use parentheses there, please, use quotation of the whole expression between the +b and -b (otherwise there will be issues with the shell or command line interpreter related to parentheses). For example, on Linux bash or Windows PowerShell: +b \'P45(A345 B32)\' -b. If you use another command line environment or interpreter, please, refer to the documentation for your case about the quotation and quotes. For more information, see: \nhttps://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioEng.7.pdf in English or: \nhttps://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioUkr.7.pdf in Ukrainian.\n"
   | xs == "l2" = putStrLn "+l2 ... -l2 \t— if present and has inside Ukrainian text then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +l2 ... -l2 is present.\n"
+  | xs == "ln" = putStrLn "+ln ... -ln \t— if present and has inside a sequence of Word8 values i. e. positive integer numbers less than 256 then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +ln ... -ln is present.\n"
   | xs == "q" = putStrLn "+q \t— if present with +l2 ... -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.\n"
   | xs == "ul" = putStrLn "+ul \t— afterwards there is a string that encodes which sounds are used for diversity property evaluation. If used, then +r group has no meaning and is not used. Unlike in the link, the argument \"1\" means computing the property for all the sound representations included (for all of the present representations, so the value is maximal between all other strings instead of \"1\"). For more information, see: https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types\n"
   | xs == "r" = putStrLn "+r \t— afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: \"543\" means that the line is splitted into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7...2. The values less than the lowest minimum are neglected.\n"
@@ -196,6 +201,7 @@ helpPrint xs
             | xs == "+a" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","a"] 
             | xs == "+b" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","b"] 
             | xs == "+l2" = ["0","4","l2"] 
+            | xs == "+ln" = ["0","8","ln"] 
             | xs == "+q" = ["0","4","OR","5","OR","6","q"] 
             | xs == "+ul" = ["0","3","ul"] 
             | xs == "+r" = ["0","1","r"] 

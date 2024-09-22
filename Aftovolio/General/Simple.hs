@@ -24,8 +24,9 @@ import Data.Char (isDigit,isSpace)
 import CLI.Arguments
 import CLI.Arguments.Get
 import CLI.Arguments.Parsing
-import GHC.Int (Int8)
 import Data.Ord (comparing)
+import GHC.Int (Int8)
+import GHC.Word (Word8)
 import Aftovolio.ConstraintsEncoded
 import Aftovolio.PermutationsArr
 import Aftovolio.StrictVG
@@ -45,7 +46,7 @@ import Control.DeepSeq
 generalF 
  :: Int -- ^ A power of 10. The resulting distance using next ['Word8'] argument is quoted by 10 in this power. The default one is 0. The proper values are in the range [0..4].
  -> Int -- ^ A 'length' of the next argument here.
- -> [Word8] -- ^ A list of non-negative values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+ -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
@@ -251,7 +252,9 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
     let line2comparewith
           | oneC "+l2" argsC || null linecomp3 = unwords . getC "+l2" $ argsC
           | otherwise = linecomp3
-        basecomp = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . h . createSyllablesPL wrs ks arr gs us vs) $ line2comparewith
+        basecomp 
+          | oneC "+ln" argsC = force . catMaybes . map (\xs -> readMaybe xs::Maybe Word8) . getC "+ln" $ argsC -- to read positive Word8 values as a list of them.
+          | otherwise = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . h . createSyllablesPL wrs ks arr gs us vs) $ line2comparewith
         (filesave,codesave)
           | null filedata = ("",-1)
           | length filedata == 2 = (head filedata, fromMaybe 0 (readMaybe (last filedata)::Maybe Int))
@@ -301,7 +304,7 @@ processingF selFun wrs ks arr gs us vs h numTest hc (grps,mxms) ysss zsss descen
 -- PhLADiPreLiO constraints. For more information, see:
 -- https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#constraints 
 cSpecs :: CLSpecifications
-cSpecs = zip ["+a","+b","+l2"] . cycle $ [-1]
+cSpecs = zip ["+a","+b","+l2","+ln"] . cycle $ [-1]
 
 bSpecs :: CLSpecifications
 bSpecs = [("+f",2),("+m",2),("+m2",2),("+m3",3),("+ul",1),("+w",1),("+dc",2),("+q",1),("-cm",1)]
@@ -351,7 +354,7 @@ outputWithFile
      -> String -- ^ Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
      -> String -- ^ Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
      -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
-     -> [Word8] -- ^ A list of non-negative values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+     -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
      -> [AftovolioGen]
      -> Int
      -> a1

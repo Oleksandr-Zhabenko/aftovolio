@@ -6,7 +6,7 @@ Oleksandr Zhabenko
 
 # Introduction
 
-Here is a brief introduction of AFTOVolio ideas and usage (that is Dutch 'Aanpak van Fonetische Talen voor het Ontdekken van de VOorkeursLIneOpties' — Phonetic Languages Approach for Discovering the Preferred Line Options).
+Here is a brief introduction of AFTOVolio ideas and usage (that is Dutch 'Aanpak van Fonetische Talen voor het Ontdekken van de VOorkeursLIjnOpties' (Dutch people consider ji as a one letter and consequently one sound, but we use just first one for good readability) — Phonetic Languages Approach for Discovering the Preferred Line Options).
 
 Using AFTOVolio lets a person learn how to write the texts with the desired properties in pronunciation. 
 
@@ -958,6 +958,9 @@ OR:
 - aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] <Ukrainian textual line>
 
 OR:
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] <Ukrainian textual line>
+
+OR:
 - aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+m <FilePath> <num1> +m2 <num2>]]
 
 OR:
@@ -998,6 +1001,8 @@ https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioUkr.7.pdf
 in Ukrainian.
 
 - +l2 \... -l2     — if present and has inside Ukrainian text then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +l2 \... -l2 is present.
+
+- +ln \... -ln     — if present and has inside a sequence of positive Word8 values not greater than 255 then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +ln \... -ln is present.
 
 - +q      — if present with +l2 \... -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.
 
