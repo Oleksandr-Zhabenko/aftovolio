@@ -6,7 +6,7 @@
 -- Maintainer  :  oleksandr.zhabenko@yahoo.com
 
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-{-# LANGUAGE NoImplicitPrelude, BangPatterns #-}
+{-# LANGUAGE NoImplicitPrelude, BangPatterns, StrictData #-}
 
 module Aftovolio.General.Datatype3 (
    Read0
@@ -28,7 +28,7 @@ import GHC.List
 import GHC.Word
 import GHC.Real (floor,fromIntegral,(/)) 
 import GHC.Float (int2Double) 
-import Data.List (groupBy,find)
+import Data.List (groupBy,find,maximumBy,minimumBy)
 import Data.Char (isDigit, isSpace,isLetter)
 import Text.Read (readMaybe)
 import Text.Show (Show(..))
@@ -37,6 +37,7 @@ import Data.Maybe (fromMaybe)
 import Data.Tuple (fst,snd)
 import qualified Data.Foldable as F (foldr) 
 import qualified Data.Sequence as S
+import Data.Ord (comparing) 
 import ListQuantizer (round2GL) 
 
 -- | Is a way to read duration of the additional added time period into the line.
@@ -194,14 +195,12 @@ showRead0AsInsert d@(B t) = '_':(filter (/= '.') . show $ t)
 showRead0AsInsert d@(C ts) = ts
 {-# INLINE showRead0AsInsert #-}
 
--- | Is intended to be used to transform the earlier data for AFTOVolio representations durations from 'Double' to 'Word8' values. It was used during the transition from the ukrainian-phonetics-basic-array-0.7.1.1 to ukrainian-phonetics-basic-array-0.10.0.0.
+-- | Is intended to be used to transform the earlier data for AFTOVolio representations durations from 'Double' to 'Word8' values. It was used during the transition from the ukrainian-phonetics-basic-array-0.7.1.1 to ukrainian-phonetics-basic-array-0.10.0.0. 
 zippedDouble2Word8 xs = map (\(t, u) -> (t,fromMaybe 15 . hh $ u)) xs 
-  where !h = snd . head $ xs
-        !lt = snd . last $ xs
+  where !h = snd . minimumBy (comparing snd) $ xs
+        !lt = snd . maximumBy (comparing snd) $ xs
         !del = (lt - h)/14.0
         !ys  = take 15 . iterate (+del) $ h
         !zs = zip [1..15] ys
         gg !u = fromMaybe lt . round2GL True (\_ _ -> EQ) ys $ u
         hh !u = fmap fst . find ((== gg u) . snd) $ zs
-
-

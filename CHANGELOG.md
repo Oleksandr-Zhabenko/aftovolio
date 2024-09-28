@@ -8,3 +8,7 @@
 
 * Second version. Added possibility to specify sequence of Word8 numbers as durations to  be compared with in the +ln ... -ln command line arguments group.
 
+##  0.2.1.0 -- 2024-09-28
+
+* Second version revised A. Updated dependencies. Some minor code usability improvements.
+ 

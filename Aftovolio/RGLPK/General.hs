@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude, StrictData #-}
 {-# OPTIONS_HADDOCK show-extensions #-}
 
 -- |

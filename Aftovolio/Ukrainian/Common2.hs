@@ -1,5 +1,5 @@
 {-# OPTIONS_HADDOCK show-extensions #-}
-{-# LANGUAGE BangPatterns, NoImplicitPrelude #-}
+{-# LANGUAGE BangPatterns, NoImplicitPrelude, StrictData #-}
 
 -- |
 -- Module      :  Aftovolio.Ukrainian.Common2

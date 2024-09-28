@@ -1,9 +1,9 @@
 {-# OPTIONS_HADDOCK show-extensions #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude, StrictData #-}
 
 -- |
 -- Module      :  Aftovolio.Coeffs
--- Copyright   :  (c) OleksandrZhabenko 2020-2023
+-- Copyright   :  (c) OleksandrZhabenko 2020-2024
 -- License     :  MIT
 -- Stability   :  Experimental
 -- Maintainer  :  oleksandr.zhabenko@yahoo.com

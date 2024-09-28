@@ -1,8 +1,5 @@
 {-# OPTIONS_HADDOCK show-extensions #-}
 
-
-
-
 -- |
 -- Module      :  Aftovolio.ConstraintsEncoded
 -- Copyright   :  (c) OleksandrZhabenko 2020-2024
@@ -13,7 +10,7 @@
 -- Provides a way to encode the needed constraint with possibly less symbols.
 -- Uses arrays instead of vectors.
 
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, NoImplicitPrelude, BangPatterns #-}
+{-# LANGUAGE FlexibleInstances, FlexibleContexts, NoImplicitPrelude, BangPatterns, StrictData #-}
 
 module Aftovolio.ConstraintsEncoded (
   -- * Data types

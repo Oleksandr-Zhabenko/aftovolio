@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, BangPatterns, DeriveGeneric #-}
+{-# LANGUAGE NoImplicitPrelude, BangPatterns, DeriveGeneric, StrictData #-}
 
 module Aftovolio.General.Simple where
 

@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -funbox-strict-fields -fobject-code #-}
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE UnboxedTuples #-}
+{-# LANGUAGE UnboxedTuples, StrictData #-}
 {-# LANGUAGE MagicHash #-}
 
 -- |

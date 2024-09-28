@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, ScopedTypeVariables, DeriveGeneric #-}
+{-# LANGUAGE NoImplicitPrelude, ScopedTypeVariables, DeriveGeneric, StrictData #-}
 
 module Aftovolio.Ukrainian.IO where
 
