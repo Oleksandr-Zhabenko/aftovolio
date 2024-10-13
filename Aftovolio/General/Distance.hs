@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Aftovolio.General.Distance where
 
@@ -7,7 +9,9 @@ import GHC.Real (Integral,Fractional(..),Real(..),gcd,quot,(/),fromIntegral,toIn
 import GHC.Float (Floating(..),sqrt)
 import GHC.List
 import Data.List (replicate)
-import GHC.Num ((*),(-),subtract,abs)
+import GHC.Num ((*),(-),subtract,abs,Integer)
+import GHC.Word
+import GHC.Int
 
 -- | 'toEqLength' changes two given lists into two lists of equal
 -- minimal lengths and also returs its new length and initial lengths of the lists given.
@@ -36,11 +40,23 @@ toEqLengthL lx ly xs ys
              vs = concatMap (replicate (lx `quot` dc)) $ ys
 
 -- | Is also a simplified distance between the lists. Intended to be used with 'Word8'.
-sumAbsDistNorm :: (Integral a, Ord a) => [a] -> [a] -> a
+sumAbsDistNorm :: (Integral a, Ord a) => [a] -> [a] -> Integer
 sumAbsDistNorm xs ys 
  | lc == 0 = 0
- | otherwise = fromIntegral . sum . zipWith (\x y -> toInteger (if x > y then x-y else y-x)) ts $ vs
+ | otherwise = sum . zipWith (\x y -> toInteger (if x > y then x-y else y-x)) ts $ vs
      where (ts, vs, lc, lx, ly) = toEqLength xs ys 
+
+-- | Intended to be used with 'Compards' of the same constructor in both arguments of the function. Otherwise returns -1.
+sumAbsDistNormComp :: Compards -> Compards -> Integer
+sumAbsDistNormComp x1s@(C1 xs) y1s@(C1 ys) 
+ | lc == 0 = 0
+ | otherwise = sum . zipWith (\x y -> toInteger (if x > y then x-y else y-x)) ts $ vs
+     where (ts, vs, lc, lx, ly) = toEqLength xs ys 
+sumAbsDistNormComp x1s@(C2 xs) y1s@(C2 ys) 
+ | lc == 0 = 0
+ | otherwise = sum . zipWith (\x y -> toInteger (if x > y then x-y else y-x)) ts $ vs
+     where (ts, vs, lc, lx, ly) = toEqLength xs ys 
+sumAbsDistNormComp _ _ = -1
 
 sumSqrDistNorm :: (Real a, Fractional a) => [a] -> [a] -> a
 sumSqrDistNorm xs ys 
@@ -84,4 +100,40 @@ distanceSqrG2 lc xs ys = sqrt (sum (zipWith (\x y -> (x - y) * (x - y)) xs qs) /
          dc = lc `quot` lr
          qs = concatMap (replicate dc) rs
 {-# INLINE distanceSqrG2 #-}
+
+data Compards = C1 [Word8] | C2 [Int8] deriving (Eq)
+
+isWord8Based :: Compards -> Bool
+isWord8Based (C1 _) = True
+isWord8Based _ = False
+
+isInt8Based :: Compards -> Bool
+isInt8Based (C2 _) = True
+isInt8Based _ = False
+
+{-| The elements in  the first argument must not be greater than 127 though it is not checked. -}
+fromSmallWord8toInt8Diff :: [Word8] -> [Int8]
+fromSmallWord8toInt8Diff xs@(_:ys) = zipWith (\t u -> fromIntegral u - fromIntegral t) xs ys
+fromSmallWord8toInt8Diff [] = []
+{-# INLINE fromSmallWord8toInt8Diff #-}
+
+class DoubleFunc a b c d where
+  doubleFunc :: (a -> c) -> (b -> c) -> d -> c
+
+instance (DoubleFunc [Word8] [Int8] Int) Compards where
+  doubleFunc f g (C1 xs) = f xs
+  doubleFunc f g (C2 ys) = g ys
+
+instance (DoubleFunc [Word8] [Int8] Compards) Compards where
+  doubleFunc f g (C1 xs) = f xs
+  doubleFunc f g (C2 ys) = g ys
+
+instance (DoubleFunc [Word8] [Int8] Bool) Compards where
+  doubleFunc f g (C1 xs) = f xs
+  doubleFunc f g (C2 ys) = g ys
+
+instance (DoubleFunc [Word8] [Int8] Integer) Compards where
+  doubleFunc f g (C1 xs) = f xs
+  doubleFunc f g (C2 ys) = g ys
+
 

@@ -16,7 +16,8 @@ import GHC.Num (Num,(+),(-),(*),Integer)
 import Text.Read (readMaybe)
 import System.IO (putStrLn, FilePath,stdout,universalNewlineMode,hSetNewlineMode,getLine,appendFile,readFile,writeFile,putStr)
 import Rhythmicity.MarkerSeqs hiding (id) 
-import Data.List hiding (foldr)
+import Data.List hiding (foldr,null)
+import qualified Data.List as L (null)
 import Data.Ord (Down(..))
 import Data.Maybe (fromMaybe, mapMaybe, catMaybes,isNothing,fromJust) 
 import Data.Tuple (fst)
@@ -46,7 +47,7 @@ import Control.DeepSeq
 generalF 
  :: Int -- ^ A power of 10. The resulting distance using next ['Word8'] argument is quoted by 10 in this power. The default one is 0. The proper values are in the range [0..4].
  -> Int -- ^ A 'length' of the next argument here.
- -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+ -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
@@ -73,7 +74,7 @@ generalF
  -> [String] 
  -> IO [String] 
 generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps,mxms) descending hashStep emptyline splitting (fs, code) concurrently initstr universalSet 
- | null universalSet = do
+ | L.null universalSet = do
      let strOutput = ["You have specified the data and constraints on it that lead to no further possible options.", "Please, specify another data and constraints."] 
      putStrLn . unlines $ strOutput
      return strOutput
@@ -83,17 +84,17 @@ generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb
  | otherwise = do
    let syllN = countSyll wrs arr us vs initstr
        f ldc compards grps mxms 
-          | null selStr = (if null compards then (sum . countHashes2G hashStep hc grps mxms) else ((`quot` 10^power10) . fromIntegral . sumAbsDistNorm compards)) . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . h .  createSyllablesPL wrs ks arr gs us vs)
+          | L.null selStr = (if doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards then (sum . countHashes2G hashStep hc grps mxms) else (`quot` 10^power10) . fromIntegral . sumAbsDistNormComp compards . (if isWord8Based compards then C1 else C2 . fromSmallWord8toInt8Diff)) . read3 (not . L.null . filter (not . isSpace)) 1.0 (mconcat . h .  createSyllablesPL wrs ks arr gs us vs)
           | otherwise = fromIntegral . diverse2GGL (selectSounds selFun selStr) (us `mappend` vs) . concatMap string1 . stringToXG wrs . filter (\c -> not (isDigit c) && c /= '_' && c /= '=')
    hSetNewlineMode stdout universalNewlineMode
-   if numTest >= 0 && numTest <= 179 && numTest /= 1 && null compards then testsOutput concurrently syllN f ldc numTest universalSet 
+   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards then testsOutput concurrently syllN f ldc numTest universalSet 
    else let sRepresent = zipWith (\k (x, ys) -> S k x ys) [1..] . 
              (if descending then sortOn (\(u,w) -> (Down u,w)) else sortOn id) . map (\xss -> (f ldc compards grps mxms xss, xss)) $ universalSet
             strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) (if html then "<br>" else "") (jjj splitting) $ sRepresent
             lns1 = unlines strOutput
                           in do
                              putStrLn lns1
-                             if null dcfile then putStr "" 
+                             if L.null dcfile then putStr "" 
                              else do 
                                  doesFileExist dcfile >>= \exist -> if exist then do 
                                        getPermissions dcfile >>= \perms -> if writable perms then writeFile dcfile lns1 
@@ -139,13 +140,13 @@ countSyll
   -> String 
   -> Int
 countSyll wrs arr us vs xs = numUnderscoresSyll + (fromEnum . foldr (\x y -> if createsSyllable x then y + 1 else y) 0 . concatMap (str2PRSs arr) . words1 . mapMaybe g . concatMap string1 . stringToXG wrs $ xs)
-   where numUnderscoresSyll = length . filter (\xs -> let (ys,ts) = splitAt 1 xs in ys == "_" && all isDigit ts && not (null ts)) . groupBy (\x y -> x=='_' && isDigit y) $ xs
+   where numUnderscoresSyll = length . filter (\xs -> let (ys,ts) = splitAt 1 xs in ys == "_" && all isDigit ts && not (L.null ts)) . groupBy (\x y -> x=='_' && isDigit y) $ xs
          g :: Char -> Maybe Char
          g x
           | x `elem` us = Nothing
           | x `notElem` vs = Just x
           | otherwise = Just ' '
-         words1 xs = if null ts then [] else w : words1 s'' -- Practically this is an optimized version for this case 'words' function from Prelude.
+         words1 xs = if L.null ts then [] else w : words1 s'' -- Practically this is an optimized version for this case 'words' function from Prelude.
            where ts = dropWhile (== ' ') xs
                  (w, s'') = break (== ' ') ts
          {-# NOINLINE words1 #-}
@@ -185,15 +186,15 @@ argsProcessing
  -> [[String]]
  -> [[String]]
  -> String 
- -> IO (Int, Int, [Word8], Bool, FilePath, String, String, String, Int, Bool, Int8, FilePath, Int, Bool, String, [String]) -- ^ These ones are intended to be used inside 'generalF'.
+ -> IO (Int, Int, Compards, Bool, FilePath, String, String, String, Int, Bool, Int8, FilePath, Int, Bool, String, [String]) -- ^ These ones are intended to be used inside 'generalF'.
 argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
   args0 <- getArgs
   let (argsC, args) = takeCs1R ('+','-') cSpecs args0
       (argsB, args11) = takeBsR bSpecs args
       compareByLinesFinalFile = concat . getB "-cm" $ argsB
-  if not . null $ compareByLinesFinalFile then do
+  if not . L.null $ compareByLinesFinalFile then do
       compareFilesToOneCommon 14 args11 compareByLinesFinalFile
-      return (0,0,[],False,[],[],[],[],0,False,0,[],0,False,[],[]) 
+      return (0,0,(C1 []),False,[],[],[],[],0,False,0,[],0,False,[],[]) 
   else do
     let prepare = any (== "-p") args11
         emptyline = any (== "+l") args11 
@@ -201,7 +202,7 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
         concurrently = any (== "-C") args11
         dcspecs = getB "+dc" argsB
         (html,dcfile) 
-          | null dcspecs = (False, "")
+          | L.null dcspecs = (False, "")
           | otherwise = (head dcspecs == "1",last dcspecs)
         selStr = concat . getB "+ul" $ argsB
         filedata = getB "+f" argsB
@@ -219,7 +220,7 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
           | oneB "+m2" argsB = (getB "+m" argsB,  max 1 (fromMaybe 1 (readMaybe (concat . getB "+m2" $ argsB)::Maybe Int)))
           | otherwise = (getB "+m" argsB, -1)
         (fileread,lineNmb)
-          | null multiline2 = ("",-1)
+          | L.null multiline2 = ("",-1)
           | length multiline2 == 2 = (head multiline2, fromMaybe 1 (readMaybe (last multiline2)::Maybe Int))
           | otherwise = (head multiline2, 1)
     (arg3s,prestr,poststr,linecomp3) <- do
@@ -249,14 +250,15 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
                     | otherwise = lns !! (ln1 - 1)
              return $ (words lineF, line_1F,line1F,linecomp3)
          else return (args11, [], [],[])
-    let line2comparewith
-          | oneC "+l2" argsC || null linecomp3 = unwords . getC "+l2" $ argsC
+    let differentiate = any (== "+di") args11
+        line2comparewith
+          | oneC "+l2" argsC || L.null linecomp3 = unwords . getC "+l2" $ argsC
           | otherwise = linecomp3
         basecomp 
-          | oneC "+ln" argsC = force . catMaybes . map (\xs -> readMaybe xs::Maybe Word8) . getC "+ln" $ argsC -- to read positive Word8 values as a list of them.
-          | otherwise = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . h . createSyllablesPL wrs ks arr gs us vs) $ line2comparewith
+          | oneC "+ln" argsC = (if differentiate then C2 . fromSmallWord8toInt8Diff else C1) . catMaybes . map (\xs -> readMaybe xs::Maybe Word8) . getC "+ln" $ argsC -- to read positive Word8 values as a list of them.
+          | otherwise = (if differentiate then C2 . fromSmallWord8toInt8Diff else C1) . read3 (not . L.null . filter (not . isSpace)) 1.0 (mconcat . h . createSyllablesPL wrs ks arr gs us vs) $ line2comparewith
         (filesave,codesave)
-          | null filedata = ("",-1)
+          | L.null filedata = ("",-1)
           | length filedata == 2 = (head filedata, fromMaybe 0 (readMaybe (last filedata)::Maybe Int))
           | otherwise = (head filedata,0)
         ll = let maxWordsNum = (if any (== "+x") arg3s then 9 else 7) in take maxWordsNum . (if prepare then id else words . mconcat . prepareTextN maxWordsNum ysss zsss xs . unwords) $ arg3s
@@ -264,18 +266,18 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
         argCs = catMaybes (fmap (readMaybeECG l) . getC "+a" $ argsC)
         argCBs = unwords . getC "+b" $ argsC -- If you use the parenthese with +b ... -b then consider also using the quotation marks for the whole algebraic constraint. At the moment though it is still not working properly for parentheses functionality. The issue should be fixed in the further releases.
         !perms 
-          | not (null argCBs) = filterGeneralConv l argCBs . genPermutationsL $ l
-          | null argCs = genPermutationsL l
+          | not (L.null argCBs) = filterGeneralConv l argCBs . genPermutationsL $ l
+          | L.null argCs = genPermutationsL l
           | otherwise = decodeLConstraints argCs . genPermutationsL $ l 
         basiclineoption = unwords arg3s
-        example = force . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . h .  createSyllablesPL wrs ks arr gs us vs) . unwords $ arg3s
-        le = length example
-        lb = length basecomp
+        example = (if differentiate then C2 . fromSmallWord8toInt8Diff else C1) . read3 (not . L.null . filter (not . isSpace)) 1.0 (mconcat . h .  createSyllablesPL wrs ks arr gs us vs) . unwords $ arg3s
+        le = doubleFunc (length::[Word8]->Int) (length::[Int8]->Int) example
+        lb = doubleFunc (length::[Word8]->Int) (length::[Int8]->Int) basecomp
         gcd1 = gcd le lb
         ldc = le * lb `quot` gcd1
         mulp = ldc `quot` lb
 --        max2 = maximum basecomp
-        compards = force . concatMap (replicate mulp) $ basecomp
+        compards = let ff g1 g2 ks = if isWord8Based ks then C1 . g1 . (\(C1 us) -> us) $ ks else C2 . g2 . (\(C2 us) -> us)$ ks in ff (concatMap (replicate mulp)) (concatMap (replicate mulp)) basecomp
         variants1 = force . uniquenessVariants2GNBL ' ' id id id perms $ ll
     return (power10, ldc, compards, html, dcfile, selStr, prestr, poststr, lineNmb, emptyline, splitting, filesave, codesave, concurrently, basiclineoption, variants1)
 
@@ -327,8 +329,8 @@ testsOutput
   :: (Show a1, Integral a1) =>
      Bool
      -> Int
-     -> (p -> [a2] -> Int8 -> [Int8] -> String -> a1)
-     -> p
+     -> (Int -> Compards -> Int8 -> [Int8] -> String -> a1)
+     -> Int
      -> Int
      -> [String]
      -> IO [String]
@@ -336,8 +338,8 @@ testsOutput concurrently syllN f ldc numTest universalSet = do
       putStrLn "Feet   Val  Stat   Proxim" 
       (if concurrently then mapConcurrently else mapM) 
            (\(q,qs) -> let m = stat1 syllN (q,qs)
-                           (min1,max1) = force . fromJust . minMax11By (comparing (f ldc [] q qs)) $ universalSet 
-                           mx = f ldc [] q qs max1
+                           (min1,max1) = force . fromJust . minMax11By (comparing (f ldc (C1 []) q qs)) $ universalSet 
+                           mx = f ldc (C1 []) q qs max1
                            strTest = (show (fromEnum q) `mappend` "   |   " `mappend`  show mx `mappend` "     " `mappend` show m `mappend` "  -> " `mappend` showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%" `mappend` (if rem numTest 10 >= 4 
                                                                then -- let min1 = minimumBy (comparing (f ldc [] q qs)) universalSet in 
                                                                      ("\n" `mappend` min1 `mappend` "\n" `mappend` max1 `mappend` "\n")  
@@ -345,8 +347,7 @@ testsOutput concurrently syllN f ldc numTest universalSet = do
 
 -- | Internal part of the 'generalF' for processment with a file.
 outputWithFile
-  :: (Eq a1, Num a1) =>
-     ([[[PRS]]] -> [[Word8]]) -- ^ Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
+  :: ([[[PRS]]] -> [[Word8]]) -- ^ Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
      -> GWritingSystemPRPLX -- ^ Data used to obtain the phonetic language representation of the text.
      -> [(Char, Char)] -- ^ The pairs of the 'Char' that corresponds to the similar phonetic languages consonant phenomenon (e. g. allophones). Must be sorted in the ascending order to be used correctly. 
      -> CharPhoneticClassification
@@ -354,17 +355,17 @@ outputWithFile
      -> String -- ^ Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
      -> String -- ^ Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
      -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
-     -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+     -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
      -> [AftovolioGen]
      -> Int
-     -> a1
+     -> Int8
      -> FilePath -- ^ A file to be probably added output parts to.
      -> Int
      -> IO ()
 outputWithFile h wrs ks arr gs us vs selStr compards sRepresent code grps fs num
   | mBool && code >= 10 && code <= 19 && grps == 2 = putStrLn (mconcat [textP, "\n", breaks, "\n", show rs]) >> appendF ((if code >= 15 then mconcat [show rs, "\n", breaks, "\n"] else "") `mappend` outputS)
   | otherwise = appendF outputS
-           where mBool = null selStr && null compards
+           where mBool = L.null selStr && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards
                  appendF = appendFile fs
                  lineOption = head . filter (\(S k _ _) -> k == num) $ sRepresent
                  textP = (\(S _ _ ts) -> ts) lineOption

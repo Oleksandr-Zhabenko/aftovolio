@@ -15,7 +15,8 @@ import Data.Ord (Down(..))
 import Data.Char (isDigit,toLower,isSpace)
 import System.IO (putStrLn, FilePath,stdout,hSetNewlineMode,universalNewlineMode,getLine,appendFile,writeFile,putStr,readFile)
 import qualified Rhythmicity.MarkerSeqs as R --hiding (id)
-import Data.List hiding (foldr)
+import Data.List hiding (foldr,null)
+import qualified Data.List as L (null) 
 import Data.Foldable (mapM_)
 import Data.Maybe (isNothing,fromJust,fromMaybe) 
 import Data.Tuple (fst,snd)
@@ -42,7 +43,7 @@ import Control.DeepSeq
 generalF
  :: Int -- ^ A power of 10. The distance value is quoted by 10 in this power if the next ['Word8'] argument is not empty. The default one is 0. The right values are in the range [0..4].
  -> Int -- ^ A 'length' of the next argument here.
- -> [Word8] -- ^ A list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null.
+ -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
@@ -66,18 +67,18 @@ generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb file 
    syllableDurationsDs <- readSyllableDurations file
    let syllN = countSyll initstr
        f ldc compards syllableDurationsDs grps mxms -- Since the version 0.12.0.0, has a possibility to evaluate diversity property.
-            | null selStr = (if null compards then (sum . R.countHashes2G hashStep hc grps mxms) else ((`quot` 10^power10) . fromIntegral . sumAbsDistNorm compards)) . read3 (not . null . filter (not . isSpace)) 1.0 (mconcat . (if null file then case k of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} 
+            | L.null selStr = (if doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]-> Bool) compards then (sum . R.countHashes2G hashStep hc grps mxms) else (`quot` 10^power10) . fromIntegral . sumAbsDistNormComp compards . (if isWord8Based compards then C1 else C2 . fromSmallWord8toInt8Diff)) .  read3 (not . L.null . filter (not . isSpace)) 1.0 (mconcat . (if L.null file then case k of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} 
                          else  if length syllableDurationsDs >= k then syllableDurationsDs !! (k - 1) else syllableDurationsD2) . createSyllablesUkrS) 
             | otherwise = fromIntegral . diverse2GGL (selectSounds selStr) [100,101] . convertToProperUkrainianI8 . filter (\c -> not (isDigit c) && c /= '_' && c/= '=')
    hSetNewlineMode stdout universalNewlineMode
-   if numTest >= 0 && numTest <= 179 && numTest /= 1 && null compards then testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet
+   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]-> Bool) compards then testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet
    else let sRepresent = zipWith (\k (x, ys) -> S k x ys) [1..] . 
                    (if descending then sortOn (\(u,w) -> (Down u, w)) else sortOn id) . map (\xss -> (f ldc compards syllableDurationsDs grps mxms xss, xss)) $ universalSet
             strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) (if html then "<br>" else "") (jjj splitting) $ sRepresent
                         in do
                              let lns1 = unlines strOutput
                              putStrLn lns1
-                             if null dcfile then putStr "" 
+                             if L.null dcfile then putStr "" 
                                             else do 
                                                 exist <- doesFileExist dcfile 
                                                 if exist then do 
@@ -126,14 +127,14 @@ instance Show AftovolioUkr where
 
 countSyll :: String -> Int
 countSyll xs = numUnderscoresSyll + (fromEnum . foldr (\x y -> if isVowel1 x then y + 1 else y) 0 . convertToProperUkrainianI8 $ xs)
-  where numUnderscoresSyll = length . filter (\xs -> let (ys,ts) = splitAt 1 xs in ys == "_" && all isDigit ts && not (null ts)) . groupBy (\x y -> x=='_' && isDigit y) $ xs
+  where numUnderscoresSyll = length . filter (\xs -> let (ys,ts) = splitAt 1 xs in ys == "_" && all isDigit ts && not (L.null ts)) . groupBy (\x y -> x=='_' && isDigit y) $ xs
 
 stat1 :: Int -> (Int8,[Int8]) -> Int
 stat1 n (k, ks) = fst (n `quotRemInt` fromEnum k) * length ks
 
 parseHelp :: [String] -> (String,[String])
 parseHelp xss 
-  | null xss = ([],[])
+  | L.null xss = ([],[])
   | otherwise = (unwords rss, uss `mappend` qss)
        where (yss,tss) = break (== "-b") xss
              (uss,wss) = break (== "+b") yss
@@ -172,8 +173,8 @@ testsOutput
   :: (Show a1, Integral a1) =>
      Bool -- ^ Whether to run tests concurrently or not. 'True' corresponds to concurrent execution that can speed up the getting results but use more resources.
      -> Int
-     -> (p1 -> [a2] -> p2 -> Int8 -> [Int8] -> String -> a1)
-     -> p1
+     -> (Int -> Compards -> p2 -> Int8 -> [Int8] -> String -> a1)
+     -> Int
      -> p2
      -> Int
      -> [String]
@@ -184,8 +185,8 @@ testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet = 
           then mapConcurrently
           else mapM) (\(q,qs) -> 
                           let m = stat1 syllN (q,qs)
-                              (min1, max1) = force . fromJust . minMax11By (comparing (f ldc [] syllableDurationsDs q qs)) $ universalSet 
-                              mx = f ldc [] syllableDurationsDs q qs max1 
+                              (min1, max1) = force . fromJust . minMax11By (comparing (f ldc (C1 []) syllableDurationsDs q qs)) $ universalSet 
+                              mx = f ldc (C1 []) syllableDurationsDs q qs max1 
                               strTest = (show (fromEnum q) `mappend` "   |   " `mappend`  show mx `mappend` "     " `mappend` show m `mappend` "  -> " `mappend` 
                                   showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%" `mappend` (if rem numTest 10 >= 4 
                                                                                                                           then ("\n" `mappend` min1 `mappend` "\n" `mappend` max1 `mappend` "\n")
@@ -193,14 +194,13 @@ testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet = 
 
 -- | Part of 'generalF' for processment with a file.
 outputWithFile
-  :: (Eq a1, Num a1) =>
-     String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
-     -> [Word8] -- ^ A list of non-negative values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works as for version 0.12.1.0 without this newly-introduced argument since the version 0.13.0.0. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. 
+  :: String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
+     -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
      -> [AftovolioUkr]
      -> FilePath -- ^ The file to read the sound representation durations from.
      -> [[[[Sound8]]] -> [[Word8]]]
      -> Int
-     -> a1
+     -> Int8 
      -> Int
      -> FilePath -- ^ A file to be probably added output parts to.
      -> Int
@@ -208,12 +208,12 @@ outputWithFile
 outputWithFile selStr compards sRepresent file syllableDurationsDs code grps k fs num 
   | mBool && code >= 10 && code <= 19 && grps == 2 = putStrLn (mconcat [textP, "\n", breaks, "\n", show rs]) >> appendF ((if code >= 15 then mconcat [show rs, "\n", breaks, "\n"] else "") `mappend` outputS)
   | otherwise = appendF outputS
-           where mBool = null selStr && null compards 
+           where mBool = L.null selStr && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]-> Bool) compards 
                  appendF = appendFile fs
                  lineOption = head . filter (\(S k _ _) -> k == num) $ sRepresent
                  textP = (\(S _ _ ts) -> ts) lineOption
 --                 sylls = createSyllablesUkrS textP
                  outputS = outputSel lineOption code
-                 qqs = readEq4 (mconcat . (if null file then case k of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} else if length syllableDurationsDs >= k then syllableDurationsDs !! (k - 1) else syllableDurationsD2) . createSyllablesUkrS) (map showFS . mconcat . createSyllablesUkrS) . basicSplit $ textP 
+                 qqs = readEq4 (mconcat . (if L.null file then case k of { 1 -> syllableDurationsD; 2 -> syllableDurationsD2; 3 -> syllableDurationsD3; 4 -> syllableDurationsD4} else if length syllableDurationsDs >= k then syllableDurationsDs !! (k - 1) else syllableDurationsD2) . createSyllablesUkrS) (map showFS . mconcat . createSyllablesUkrS) . basicSplit $ textP 
                  (breaks, rs) = R.showZerosFor2PeriodMusic qqs
 

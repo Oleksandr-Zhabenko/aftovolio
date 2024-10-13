@@ -12,3 +12,6 @@
 
 * Second version revised A. Updated dependencies. Some minor code usability improvements.
  
+##  0.3.0.0 -- 2024-10-13
+
+* Third version, Added a new possibility to compare lines using the "+di" command line argument. If present implies the "differentiation" mode of computation for the comparing options with the line in +l2 or +ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines.
