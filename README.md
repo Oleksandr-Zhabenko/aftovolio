@@ -363,7 +363,7 @@ almost certainly proposes a negative answer).
 ## Ability to use your own durations of representations of sounds or phonetic phenomena
 
 The programs offer four different sets of phonetic representations by
-default but starting with version 0.13.0.0 it is possible to set your
+default but it is possible to set your
 own durations. To do this, specify them as numbers of type 'Double' in
 the file in the order defined as follows:
 
@@ -380,8 +380,7 @@ Each set should be in the following order:
 \[1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,21,22,23,24,25,26, 27,28,29,30,31, 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,66,101\]
 
 where the number corresponds to the last column in the above diagram.
-101 (prior to the version 0.20.0.0 here there was -1 instead, and it was
-at the beginning of the list, not at the end) corresponds to a pause
+101 corresponds to a pause
 between words (does not affect the search results of the line). Every
 new value must be written in the file from the new line.
 
@@ -946,19 +945,19 @@ be read more dynamically.
 
 SYNOPSIS:
 
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] <Ukrainian textual line>
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] <Ukrainian textual line>
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+n] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] <Ukrainian textual line>
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+n] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] <Ukrainian textual line>
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] <Ukrainian textual line>
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] Ukrainian textual line
 
 OR:
 - aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]
@@ -985,26 +984,34 @@ OR:
 
 - +f      — if present with two arguments specifies the file to which the output information should be appended and the mode of appending (which parts to write). The default value if the secodnd parameter is 0 or not element of [1,2,3,4,10,11,12,13,14,15,16,17,18,19] is just the resulting String option. If the second parameter is 1 then the sequential number and the text are written; if it is 2 then the estimation value and the string are written; if it is 3 then the full information is written i. e. number, string and estimation; if it is 4 then the number and estimation (no string).
 The second arguments greater or equal to 10 take effect only if the meter consists of two syllables (in case of "+r 21" command line options given). If it is 10 in such a case then before appending the line option itself to the given file there is hashes information for this line option displayed. If it is 11 — the same hashes information is displayed before processing as for 1. If it is 12 — the same hashes information is displayed before processing as for 2 and so on for 13, 14. If it is 15 up to 19 — it is analogically to the the 10–14 but the hashes information is not only printed on the screen, but appended to the file specified. These values are intended to test the interesting hypothesis about where the pauses can occur. For more information on the hypothesis, see:
- https://www.academia.edu/105067761/Why_some_lines_are_easy_to_pronounce_and_others_are_not_or_prosodic_unpredictability_as_a_characteristic_of_text
+
+https://www.academia.edu/105067761/Why_some_lines_are_easy_to_pronounce_and_others_are_not_or_prosodic_unpredictability_as_a_characteristic_of_text
 
 - +dc     — if specified with two further arguments then the first one can be 1 or something  else. If it is 1 then additionally to every line as usual there is printed also <br> html tag at the end of the line for the two-columns output. Otherwise, nothing is added to each line. The second argument further is a FilePath to the writable existing file or to the new file that will be located in the writable by the user directory. The two-column output will be additionally written to this file if it is possible, otherwise the program will end with an exception.
 
 - +a \... -a       — if present contains a group of constraints for AFTOVolio. For more information, see:
+
 https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#constraints 
+
 in English or in Ukrainian:
+
 https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Ukr.21.html#%D0%BE%D0%B1%D0%BC%D0%B5%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F-constraints
 
 - +b \... -b       — if present takes precedence over those ones in the +a \... -a group (the latter ones have no effect). A group of constraints for AFTOVolio using some boolean-based algebra. If you use parentheses there, please, use quotation of the whole expression between the +b and -b (otherwise there will be issues with the shell or command line interpreter related to parentheses). For example, on Linux bash or Windows PowerShell: +b 'P45(A345 B32)' -b. If you use another command line environment or interpreter, please, refer to the documentation for your case about the quotation and quotes. For more information, see:
+
 https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioEng.7.pdf 
+
 in English or:
+
 https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioUkr.7.pdf 
+
 in Ukrainian.
 
 - +l2 \... -l2     — if present and has inside Ukrainian text then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +l2 \... -l2 is present.
 
 - +ln \... -ln     — if present and has inside a sequence of positive Word8 values not greater than 255 then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +ln \... -ln is present.
 
-- +di     — if present implies the "differentiation" mode of computation for the comparing options with the line in +l2 or +ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines.
+- +di     — if present implies the "differentiation" mode of computation for the comparing options with the line in +l2\.\.\.-l2 or +ln\.\.\.-ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines.
 
 - +q      — if present with +l2 \... -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.
 
@@ -1044,8 +1051,8 @@ When the results of the program are displayed on the screen, these inserts will 
 
 If you specify \_1, \_10, \_100, \_1000, etc. as such an insertion, the program will assume that this insertion duration is equal to the duration of the syllable to which it refers. If the set of digits is preceded by a 0, the insertion has a shorter duration, if the 1 in the first 4 examples above is followed by digits other than 0, or if another digit is used instead of 1 or 0, the insertion has a longer duration. For example, \_05 means exactly half the duration of the syllable, and \_2 means double the duration. In any case the resulting values cannot be greater than 255, the greater ones are rounded to 255.
 
-For the "music" mode the number of syllables printed for the line does include the inserts (since the version 0.15.2.0).
+For the "music" mode the number of syllables printed for the line does include the inserts.
 
-- -cm     — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. In the version 0.16.0.0 the total number of sources is limited to no more than 14. For more information, please refer to [the link](https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#comparative-mode-of-operation-c)
+- -cm     — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. The total number of sources is limited to no more than 14. For more information, please refer to [the link](https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#comparative-mode-of-operation-c)
 
 
