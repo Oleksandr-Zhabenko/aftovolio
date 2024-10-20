@@ -19,4 +19,8 @@
 ##  0.3.0.1 -- 2024-10-15
 
 * Third version revised A. Fixed some issues with documentation README.md file.
- 
+
+## 0.3.0.2 -- 2024-10-20
+
+* Third version revised B. Some minor code improvements. Added 'Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages' section to the README.md file.
+

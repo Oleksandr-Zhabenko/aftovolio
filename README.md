@@ -932,6 +932,32 @@ not to create the impression of \"short lines\", a certain
 \"ungrouping\" of sounds should be applied, so that it can be perceived
 as a leisurely narration (as in this case).
 
+## Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages
+
+In linguistic typology, there is a prosodic classification of languages according to the rhythm of of oral speech. In this sense, speech rhythm is interpreted as a periodic isochrony (temporal and quantitative identity) of comparable phonetic units.
+
+It is believed that all the world's languages can be divided into three groups by the type of rhythm (isochrony of comparable units) can be divided into three groups, depending on which unit manifests regular (permanent) isochrony (Ladefoged 1975 (Ladefoged, Peter. "A Course in Phonetics. Harcourt Brace Jovanovich." New York (1975)), Ishchenko 2015, see link below):
+
+- syllable-timed languages: languages of syllable rhythm, that is, in which syllables - stressed and unstressed - have a relatively uniform duration. This group includes primarily the Romance languages (Spanish, French, Italian, etc;)
+
+- stressed-timed languages: languages of accent rhythm in which isochrony is manifested at the level of relatively uniform duration of intervals between adjacent stressed syllables (interaccent intervals). These include Germanic, Arabic, and Slavic languages;
+
+- mora-timed languages: languages with a mora rhythm, i.e. in which isochrony is inherent in the mora. These are primarily Japanese, as well as some languages of Austronesian, Nigerian-Congolese families. It is also believed that that Proto-Indo-European, ancient Greek, and Vedic Sanskrit were also mora-timed languages.
+
+For the Ukrainian language, Oleksandr Ishchenko's study ([Іщенко, О.С. (2015). Українська мова в просодичній типології мов світу. Dialog der Sprachen, Dialog der Kulturen. Die Ukraine aus globaler Sicht: V. Internationale virtuelle Konferenz der Ukrainistik (S. 76-85). München: Verlag Otto Sagner](https://phonetica.wordpress.com/wp-content/uploads/2015/11/ukrajinska-mova-v-prosodychniy-typologiji-mov-svitu.pdf)) found that the average duration of stressed syllables in slow speech was 240 ms ± 31%, and in fast speech - 145 ms ± 35%. The average duration of unstressed syllables in slow speech is 175 ms ±40%, in fast speech - 110 ms ± 34%. The difference between the duration of stressed and unstressed syllables in slow speech is 39%, in fast speech - 28%.
+
+Therefore, for the Ukrainian language it is appropriate to use =13 or similar values, e. g. =133 etc. for the stressed syllables to specify that they are stressed while using the aftovolioUkr program.
+
+See, for example:
+
+    aftovolioUkr +r 21 +w 54 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
+    \...
+    8  садок=133 вишне=133вий ко=133лоха=133ти надви=133шнями гудуть=133 хрущі=133   711
+    
+as the element with the maximum value. The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
+
+You can easily paste the =133 group into the text in many editors or on the command line directly.
+
 ## Conclusions
 
 It can be concluded that Taras Shevchenko wrote the lines of the poem in

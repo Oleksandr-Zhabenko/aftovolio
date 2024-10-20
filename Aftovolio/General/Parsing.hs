@@ -93,9 +93,7 @@ transformToVariations !yss
 {-# INLINE transformToVariations #-}
 
 variations :: [String] -> Bool
-variations xss 
- | any isSlash xss = if any isOpeningCurlyBracket xss && any isClosingCurlyBracket xss then True else False
- | otherwise = False
+variations xss = any isSlash xss && any isOpeningCurlyBracket xss && any isClosingCurlyBracket xss
 {-# INLINE variations #-}
 
 innerProcessmentSimple
