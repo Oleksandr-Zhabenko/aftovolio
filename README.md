@@ -932,7 +932,7 @@ not to create the impression of \"short lines\", a certain
 \"ungrouping\" of sounds should be applied, so that it can be perceived
 as a leisurely narration (as in this case).
 
-## Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages
+# Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages
 
 In linguistic typology, there is a prosodic classification of languages according to the rhythm of of oral speech. In this sense, speech rhythm is interpreted as a periodic isochrony (temporal and quantitative identity) of comparable phonetic units.
 
