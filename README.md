@@ -934,9 +934,9 @@ as a leisurely narration (as in this case).
 
 # Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages
 
-In linguistic typology, there is a prosodic classification of languages according to the rhythm of of oral speech. In this sense, speech rhythm is interpreted as a periodic isochrony (temporal and quantitative identity) of comparable phonetic units.
+In linguistic typology, there is a prosodic classification of languages according to the rhythm of oral speech. In this sense, speech rhythm is interpreted as a periodic isochrony (temporal and quantitative identity) of comparable phonetic units.
 
-It is believed that all the world's languages can be divided into three groups by the type of rhythm (isochrony of comparable units) can be divided into three groups, depending on which unit manifests regular (permanent) isochrony (Ladefoged 1975 (Ladefoged, Peter. "A Course in Phonetics. Harcourt Brace Jovanovich." New York (1975)), Ishchenko 2015, see link below):
+It is believed that all the world's languages can be divided into three groups by the type of rhythm (isochrony of comparable units), depending on which unit manifests regular (permanent) isochrony (Ladefoged 1975 (Ladefoged, Peter. "A Course in Phonetics. Harcourt Brace Jovanovich." New York (1975)), Ishchenko 2015, see link below):
 
 - syllable-timed languages: languages of syllable rhythm, that is, in which syllables - stressed and unstressed - have a relatively uniform duration. This group includes primarily the Romance languages (Spanish, French, Italian, etc;)
 
