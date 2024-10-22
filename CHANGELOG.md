@@ -24,3 +24,6 @@
 
 * Third version revised B. Some minor code improvements. Added 'Peculiarities of the stressed and unstressed syllables in Ukrainian and other languages' section to the README.md file.
 
+## 0.4.0.0 -- 2024-10-22
+
+* Fourth version. Added new command line parameter "-e" to control whether to print groups of "={digits}" on the screen while making output. Changed the number of arguments in various functions. 

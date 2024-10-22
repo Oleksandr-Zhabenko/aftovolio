@@ -67,6 +67,7 @@ main = do
         helpArg = concat . getB "-h" $ argsB
         filedata = getB "+f" argsB
         concurrently = oneA "-C" argsA
+        filtering = oneA "-e" argsA
         (multiline2, multiline2LineNum) 
           | oneB "+m3" argsB = 
               let r1ss = getB "+m3" argsB in 
@@ -141,14 +142,14 @@ main = do
     if helpMessage then do 
       hSetNewlineMode stdout universalNewlineMode
       helpPrint helpArg
-    else generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb fileDu numTest hc grpp sylD descending hashStep emptyline splitting (filesave, codesave) concurrently (unwords arg3s) variants1 >> return ()
+    else generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lineNmb fileDu numTest hc grpp sylD descending hashStep emptyline splitting (filesave, codesave) concurrently (unwords arg3s) variants1 >> return ()
 
 
 bSpecs :: CLSpecifications
 bSpecs = (zip ["+c","+d","+k","-h","+r","+s","-t","+ul","+w","+x","+q","+m2","-cm"] . cycle $ [1]) `mappend` [("+f",2),("+m",2),("+dc",2),("+m3",3)] 
 
 aSpecs :: CLSpecifications
-aSpecs = zip ["+di", "+l", "+n","-p", "-C"] . cycle $ [0]
+aSpecs = zip ["+di", "-e", "+l", "+n","-p", "-C"] . cycle $ [0]
 
 cSpecs :: CLSpecifications
 cSpecs = [("+a",-1),("+l2",-1),("+ln",-1)]
@@ -156,14 +157,14 @@ cSpecs = [("+a",-1),("+l2",-1),("+ln",-1)]
 helpPrint :: String -> IO ()
 helpPrint xs
   | xs == "0" = putStrLn "SYNOPSIS:\n"
-  | xs == "1" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] <Ukrainian textual line>\n" 
-  | xs == "2" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] <Ukrainian textual line>\n"
+  | xs == "1" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] <Ukrainian textual line>\n" 
+  | xs == "2" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] <Ukrainian textual line>\n"
   | xs == "3" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+n] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] <Ukrainian textual line>\n"
-  | xs == "4" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] <Ukrainian textual line>\n"
-  | xs == "5" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]\n"
-  | xs == "6" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]\n"
+  | xs == "4" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] <Ukrainian textual line>\n"
+  | xs == "5" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]\n"
+  | xs == "6" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]\n"
   | xs == "7" = putStrLn "aftovolioUkr [-cm <FilePath to write the resulting combined output to> <FilePaths of the files to be compared and chosen the resulting options line-by-line>]\n"
-  | xs == "8" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of Word8 positive integer values not greater than 255 e. g. 24 54 57 159 45 39 to compare similarity with> -ln]][+di] <Ukrainian textual line>\n"
+  | xs == "8" = putStrLn "aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of Word8 positive integer values not greater than 255 e. g. 24 54 57 159 45 39 to compare similarity with> -ln]][+di] <Ukrainian textual line>\n"
   | xs == "OR" = putStrLn "OR:"
   | xs == "n" = putStrLn "+n \t— if specified then the order of sorting and printing is descending (the reverse one to the default otherwise). \n"
   | xs == "l" = putStrLn "+l \t— if specified then the output for one property (no tests) contains empty lines between the groups of the line option with the same value of property. \n"
@@ -178,6 +179,7 @@ helpPrint xs
   | xs == "l2" = putStrLn "+l2 ... -l2 \t— if present and has inside Ukrainian text then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +l2 ... -l2 is present.\n"
   | xs == "ln" = putStrLn "+ln ... -ln \t— if present and has inside a sequence of Word8 values i. e. positive integer numbers less than 256 then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +ln ... -ln is present.\n"
   | xs == "di" = putStrLn "+di \t— if present implies the \"differentiation\" mode of computation for the comparing options with the line in +l2 or +ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines."
+  | xs == "e" = putStrLn "-e \t— if present suppresses the printing of \"={digits}\" in the line option to the screen. Is used for better readability, often with \"+di\"."
   | xs == "q" = putStrLn "+q \t— if present with +l2 ... -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.\n"
   | xs == "ul" = putStrLn "+ul \t— afterwards there is a string that encodes which sounds are used for diversity property evaluation. If used, then +r group has no meaning and is not used. Unlike in the link, the argument \"1\" means computing the property for all the sound representations included (for all of the present representations, so the value is maximal between all other strings instead of \"1\"). For more information, see: https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types\n"
   | xs == "r" = putStrLn "+r \t— afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: \"543\" means that the line is splitted into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7...2. The values less than the lowest minimum are neglected.\n"
@@ -193,29 +195,30 @@ helpPrint xs
     where helpFE xs = mapM helpPrint js >> return ()
           js
             | xs == "-cm" = ["0","7","cm"] 
-            | xs == "+n" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","n"] 
-            | xs == "+l" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","l"] 
-            | xs == "+w" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","w"] 
-            | xs == "+s" = ["0","1","OR","2","OR","4","OR","5","OR","6","s"] 
-            | xs == "+d" = ["0","1","OR","2","OR","4","OR","5","OR","6","d"] 
-            | xs == "-p" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","p"] 
-            | xs == "+f" = ["0","1","OR","3","OR","4","OR","5","OR","6","f"] 
-            | xs == "+dc" = ["0","1","OR","3","OR","4","OR","5","OR","6","dc"] 
-            | xs == "+a" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","a"] 
-            | xs == "+b" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","b"] 
+            | xs == "+n" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","n"] 
+            | xs == "+l" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","l"] 
+            | xs == "+w" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","w"] 
+            | xs == "+s" = ["0","1","OR","2","OR","4","OR","5","OR","6","OR","8","s"] 
+            | xs == "+d" = ["0","1","OR","2","OR","4","OR","5","OR","6","OR","8","d"] 
+            | xs == "-p" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","p"] 
+            | xs == "+f" = ["0","1","OR","3","OR","4","OR","5","OR","6","OR","8","f"] 
+            | xs == "+dc" = ["0","1","OR","3","OR","4","OR","5","OR","6","OR","8","dc"] 
+            | xs == "+a" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","a"] 
+            | xs == "+b" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","b"] 
             | xs == "+l2" = ["0","4","l2"] 
             | xs == "+ln" = ["0","8","ln"] 
-            | xs == "+di" = ["0","4","OR","5","OR","6","OR","7","OR","8","di"]
-            | xs == "+q" = ["0","4","OR","5","OR","6","q"] 
+            | xs == "+di" = ["0","1", "OR", "2", "OR","4","OR","5","OR","6","OR","8","di"]
+            | xs == "-e" = ["0","1","OR","2","OR","4","OR","5","OR","6","OR","8","e"]
+            | xs == "+q" = ["0","4","OR","5","OR","6","OR","8","q"] 
             | xs == "+ul" = ["0","3","ul"] 
             | xs == "+r" = ["0","1","r"] 
             | xs == "+c" = ["0","1","OR","2","c"] 
             | xs == "-t" = ["0","2","t"] 
             | xs == "-C" = ["0","2","C"] 
             | xs == "+k" = ["0","1","OR","2","k"] 
-            | xs == "+x" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","x"] 
+            | xs == "+x" = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","8","x"] 
             | xs == "+m" = ["0","5","m"] 
             | xs == "+m2" = ["0","5","m2"] 
             | xs == "+m3" = ["0","6","m3"] 
-            | otherwise = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","7","n","l","w","s","d","p","f","dc","a","b","l2","q","ul","r","c","t","C","k","x","m","m2","cm"]
+            | otherwise = ["0","1","OR","2","OR","3","OR","4","OR","5","OR","6","OR","7","OR","8","n","l","w","s","d","p","f","dc","a","b","l2","q","ul","r","c","t","C","k","x","m","m2","cm"]
 

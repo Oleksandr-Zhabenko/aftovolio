@@ -21,27 +21,30 @@ import GHC.Int (Int8)
 import Text.Show (Show(..))
 import System.IO (putStrLn,getLine,putStr)
 import Data.Tuple (fst)
+import Data.Char (isDigit)
 
 -- | Converts the data that is an instance of 'Show' typeclass to be printed in two-column way.
 halfsplit 
   :: (Show a, Eq b) 
   => (a -> b)
+  -> Bool  -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
   -> Int8 
   -> [a] 
   -> String
-halfsplit g = halfsplit1G g "" 
+halfsplit g filtering = halfsplit1G g filtering "" 
 {-# INLINE halfsplit #-}
 
 -- | Converts the data that is an instance of 'Show' typeclass to be printed in two-column way with
--- customizable ending of each line.
+-- customizable ending of each line. Filters out all groups of \'={digits}\' from the lines.
 halfsplit1G 
   :: (Show a, Eq b) 
   => (a -> b)
+  -> Bool -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
   -> String -- ^ Additional 'String' added to every line before the \"\\n\" character.
   -> Int8 
   -> [a] 
   -> String
-halfsplit1G g appendstr m xs 
+halfsplit1G g filtering appendstr m xs 
  | null xs = []
  | otherwise = 
     let (n, rr2) = quotRem (fromEnum m) (if m < 0 then -10 else 10)
@@ -54,7 +57,7 @@ halfsplit1G g appendstr m xs
            4 -> let us = (replicate (lt2 - ly2) [replicate l0 ' ']) `mappend` reverse (map reverse y2s) in (mconcat us, mconcat t2s)
            5 -> let us = (replicate (lt2 - ly2) [replicate l0 ' ']) `mappend` y2s
                     ks = reverse . map reverse $ t2s in (mconcat us, mconcat ks)
-           _ -> let us = reverse ys in (if rrr == 0 then map show us else replicate l0 ' ':map show us, map show ts) in ((\(rs, qs) -> mergePartsLine n (appendstr `mappend` "\n") rs qs) r) `mappend` appendstr
+           _ -> let us = reverse ys in (if rrr == 0 then map show us else replicate l0 ' ':map show us, map show ts) in (if filtering then removeChangesOfDurations else id) $ ((\(rs, qs) -> mergePartsLine n (appendstr `mappend` "\n") rs qs) r) `mappend` appendstr
               where (ys,ts) = splitAt l xs 
                     (l,rrr) = length xs `quotRem` 2
                     l0 = length . show . head $ xs 
@@ -69,18 +72,25 @@ halfsplit1G g appendstr m xs
                     ly2 = sum . map length $ y2s
                     lt2 = sum . map length $ t2s
 
--- | A generalized version of 'halfsplit1G' with the possibility to prepend and append strings to it.
+-- | A generalized version of 'halfsplit3G' with the possibility to prepend and append strings to it. These 'String's are not filtered out for the groups of \'={digits}\' from the prepending and appending 'String's.
 halfsplit2G 
   :: (Show a, Eq b) 
   => (a -> b)
+  -> Bool -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
   -> String -- ^ Additional 'String' added to every line before the \"\\n\" character.
   -> String -- ^ A 'String' that is prepended to the 'halfsplit1G' result.
   -> String -- ^ A 'String' that is appended to the 'halfsplit1G' result.
   -> Int8 
   -> [a] 
   -> String
-halfsplit2G g appendstr prestr poststr m xs = prestr `mappend` halfsplit1G g appendstr m xs `mappend` poststr
+halfsplit2G g filtering appendstr prestr poststr m xs = prestr `mappend` halfsplit1G g filtering appendstr m xs `mappend` poststr
 {-# INLINABLE halfsplit2G #-}
+
+-- | Filters out all groups of \'={digits}\' from the 'String'
+removeChangesOfDurations :: String -> String
+removeChangesOfDurations ('=':xs) = removeChangesOfDurations (dropWhile isDigit xs) 
+removeChangesOfDurations (x:xs) = x:removeChangesOfDurations xs
+removeChangesOfDurations _ = []
 
 mergePartsLine :: Int -> String -> [String] -> [String] -> String
 mergePartsLine n newlined xs ys = intercalate newlined . zipWith (\x y -> x `mappend` (replicate n (if n < 0 then '\t' else ' ')) `mappend` y) xs $ ys
@@ -98,16 +108,17 @@ showWithSpaces n x
     where xs = show x
           l = length xs
 
-print23 :: String -> String -> Int -> [String] -> IO ()
-print23 prestr poststr n xss = do
+print23 :: Bool -> String -> String -> Int -> [String] -> IO ()
+print23 filtering prestr poststr n xss = do
   putStrLn prestr
   let linez = zip xss [1..]
   if n >= 2 && n <= l - 1
       then do
           let linez3 = (\(x:y:t:xs) -> x:(' ':y):(' ':' ':t):xs) . map fst . filter (\(ts,m) -> m `elem` [n - 1..n + 1]) $ linez
-          mapM (putStrLn) linez3 >> putStrLn poststr
+          mapM putSLn linez3 >> putStrLn poststr
       else (case n of
-             1 -> putStr " " >> mapM putStrLn (take 2 xss)
-             m -> if m == l then mapM putStrLn ((\(x:y:xs) -> x:(' ':y):xs) . drop (l - 2) $ xss) else mapM putStrLn []) >> putStrLn poststr
+             1 -> putStr " " >> mapM putSLn (take 2 xss)
+             m -> if m == l then mapM putSLn ((\(x:y:xs) -> x:(' ':y):xs) . drop (l - 2) $ xss) else pure []) >> putStrLn poststr
          where l = length xss
+               putSLn = putStrLn . (if filtering then removeChangesOfDurations else id)
 

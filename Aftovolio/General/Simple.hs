@@ -49,6 +49,7 @@ generalF
  -> Int -- ^ A 'length' of the next argument here.
  -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
+ -> Bool -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
  -> (String -> String) -- ^ A function that specifies what 'Char's in the list the first argument makes to be the function sensitive to. Analogue of the @g@ function in the definition: https://hackage.haskell.org/package/phonetic-languages-simplified-examples-array-0.21.0.0/docs/src/Phonetic.Languages.Simplified.Array.Ukrainian.FuncRep2RelatedG2.html#selectSounds. Use just small 'Char' if they are letters, do not use \'.\' and spaces.
@@ -73,7 +74,7 @@ generalF
  -> String -- ^ An initial string to be analyzed.
  -> [String] 
  -> IO [String] 
-generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps,mxms) descending hashStep emptyline splitting (fs, code) concurrently initstr universalSet 
+generalF power10 ldc compards html filtering dcfile selStr selFun (prestr,poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps,mxms) descending hashStep emptyline splitting (fs, code) concurrently initstr universalSet 
  | L.null universalSet = do
      let strOutput = ["You have specified the data and constraints on it that lead to no further possible options.", "Please, specify another data and constraints."] 
      putStrLn . unlines $ strOutput
@@ -87,10 +88,10 @@ generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb
           | L.null selStr = (if doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards then (sum . countHashes2G hashStep hc grps mxms) else (`quot` 10^power10) . fromIntegral . sumAbsDistNormComp compards . (if isWord8Based compards then C1 else C2 . fromSmallWord8toInt8Diff)) . read3 (not . L.null . filter (not . isSpace)) 1.0 (mconcat . h .  createSyllablesPL wrs ks arr gs us vs)
           | otherwise = fromIntegral . diverse2GGL (selectSounds selFun selStr) (us `mappend` vs) . concatMap string1 . stringToXG wrs . filter (\c -> not (isDigit c) && c /= '_' && c /= '=')
    hSetNewlineMode stdout universalNewlineMode
-   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards then testsOutput concurrently syllN f ldc numTest universalSet 
+   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]->Bool) compards then testsOutput concurrently syllN filtering f ldc numTest universalSet 
    else let sRepresent = zipWith (\k (x, ys) -> S k x ys) [1..] . 
              (if descending then sortOn (\(u,w) -> (Down u,w)) else sortOn id) . map (\xss -> (f ldc compards grps mxms xss, xss)) $ universalSet
-            strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) (if html then "<br>" else "") (jjj splitting) $ sRepresent
+            strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) filtering (if html then "<br>" else "") (jjj splitting) $ sRepresent
             lns1 = unlines strOutput
                           in do
                              putStrLn lns1
@@ -107,10 +108,10 @@ generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb
                              if code == -1 
                                  then if lineNmb == -1 then return strOutput
                                       else do 
-                                          print23 prestr poststr 1 [initstr]
+                                          print23 filtering prestr poststr 1 [initstr]
                                           return strOutput
                                  else do 
-                                       print23 prestr poststr 1 [initstr]
+                                       print23 filtering prestr poststr 1 [initstr]
                                        parseLineNumber l1 >>= \num -> do
                                          permiss <- getPermissions fs
                                          let writ = writable permiss
@@ -186,7 +187,7 @@ argsProcessing
  -> [[String]]
  -> [[String]]
  -> String 
- -> IO (Int, Int, Compards, Bool, FilePath, String, String, String, Int, Bool, Int8, FilePath, Int, Bool, String, [String]) -- ^ These ones are intended to be used inside 'generalF'.
+ -> IO (Int, Int, Compards, Bool, Bool, FilePath, String, String, String, Int, Bool, Int8, FilePath, Int, Bool, String, [String]) -- ^ These ones are intended to be used inside 'generalF'.
 argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
   args0 <- getArgs
   let (argsC, args) = takeCs1R ('+','-') cSpecs args0
@@ -194,12 +195,13 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
       compareByLinesFinalFile = concat . getB "-cm" $ argsB
   if not . L.null $ compareByLinesFinalFile then do
       compareFilesToOneCommon 14 args11 compareByLinesFinalFile
-      return (0,0,(C1 []),False,[],[],[],[],0,False,0,[],0,False,[],[]) 
+      return (0,0,(C1 []),False,False,[],[],[],[],0,False,0,[],0,False,[],[]) 
   else do
     let prepare = any (== "-p") args11
         emptyline = any (== "+l") args11 
         splitting = fromMaybe 50 (readMaybe (concat . getB "+w" $ argsB)::Maybe Int8) 
         concurrently = any (== "-C") args11
+        filtering = any (== "-e") args11
         dcspecs = getB "+dc" argsB
         (html,dcfile) 
           | L.null dcspecs = (False, "")
@@ -279,7 +281,7 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
 --        max2 = maximum basecomp
         compards = let ff g1 g2 ks = if isWord8Based ks then C1 . g1 . (\(C1 us) -> us) $ ks else C2 . g2 . (\(C2 us) -> us)$ ks in ff (concatMap (replicate mulp)) (concatMap (replicate mulp)) basecomp
         variants1 = force . uniquenessVariants2GNBL ' ' id id id perms $ ll
-    return (power10, ldc, compards, html, dcfile, selStr, prestr, poststr, lineNmb, emptyline, splitting, filesave, codesave, concurrently, basiclineoption, variants1)
+    return (power10, ldc, compards, html, filtering, dcfile, selStr, prestr, poststr, lineNmb, emptyline, splitting, filesave, codesave, concurrently, basiclineoption, variants1)
 
 processingF
  :: (String -> String) -- ^ A function that specifies what 'Char's in the list the first argument makes to be the function sensitive to. Analogue of the @g@ function in the definition: https://hackage.haskell.org/package/phonetic-languages-simplified-examples-array-0.21.0.0/docs/src/Phonetic.Languages.Simplified.Array.Ukrainian.FuncRep2RelatedG2.html#parsey0Choice. Use just small 'Char' if they are letters, do not use \'.\' and spaces.
@@ -299,7 +301,7 @@ processingF
  -> Int -- ^ The hashing function step. The default value is 20. Is expected to be greater than 2, and better greater than 12. 
  -> String 
  -> IO ()
-processingF selFun wrs ks arr gs us vs h numTest hc (grps,mxms) ysss zsss descending hashStep xs = argsProcessing wrs ks arr gs us vs h ysss zsss xs >>= \(power10, ldc, compards, html, dcfile, selStr, prestr, poststr, lineNmb, emptyline, splitting, filesave, codesave, concurrently, basiclineoption, variants1) -> generalF power10 ldc compards html dcfile selStr selFun (prestr,poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps,mxms) descending hashStep emptyline splitting (filesave, codesave) concurrently basiclineoption variants1 >> return ()
+processingF selFun wrs ks arr gs us vs h numTest hc (grps,mxms) ysss zsss descending hashStep xs = argsProcessing wrs ks arr gs us vs h ysss zsss xs >>= \(power10, ldc, compards, html, filtering, dcfile, selStr, prestr, poststr, lineNmb, emptyline, splitting, filesave, codesave, concurrently, basiclineoption, variants1) -> generalF power10 ldc compards html filtering dcfile selStr selFun (prestr,poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps,mxms) descending hashStep emptyline splitting (filesave, codesave) concurrently basiclineoption variants1 >> return ()
 {-# INLINE processingF #-}
 
 -- | Specifies the group of the command line arguments for 'processingF', which specifies the
@@ -329,12 +331,13 @@ testsOutput
   :: (Show a1, Integral a1) =>
      Bool
      -> Int
+     -> Bool -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
      -> (Int -> Compards -> Int8 -> [Int8] -> String -> a1)
      -> Int
      -> Int
      -> [String]
      -> IO [String]
-testsOutput concurrently syllN f ldc numTest universalSet = do
+testsOutput concurrently syllN filtering f ldc numTest universalSet = do
       putStrLn "Feet   Val  Stat   Proxim" 
       (if concurrently then mapConcurrently else mapM) 
            (\(q,qs) -> let m = stat1 syllN (q,qs)
@@ -342,7 +345,7 @@ testsOutput concurrently syllN f ldc numTest universalSet = do
                            mx = f ldc (C1 []) q qs max1
                            strTest = (show (fromEnum q) `mappend` "   |   " `mappend`  show mx `mappend` "     " `mappend` show m `mappend` "  -> " `mappend` showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%" `mappend` (if rem numTest 10 >= 4 
                                                                then -- let min1 = minimumBy (comparing (f ldc [] q qs)) universalSet in 
-                                                                     ("\n" `mappend` min1 `mappend` "\n" `mappend` max1 `mappend` "\n")  
+                                                                     ("\n" `mappend` (if filtering then removeChangesOfDurations else id) min1 `mappend` "\n" `mappend` (if filtering then removeChangesOfDurations else id) max1 `mappend` "\n")  
                                                                else "")) in putStrLn strTest >> return strTest) . zip (sel2 numTest) $ (sel numTest)
 
 -- | Internal part of the 'generalF' for processment with a file.

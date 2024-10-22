@@ -45,6 +45,7 @@ generalF
  -> Int -- ^ A 'length' of the next argument here.
  -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
  -> Bool -- ^ If 'True' then adds \"<br>\" to line endings for double column output
+ -> Bool -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
  -> FilePath -- ^ A path to the file to save double columns output to. If empty then just prints to 'stdout'.
  -> String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
  -> (String, String)  -- ^ If the next element is not equal to -1, then the prepending and appending lines to be displayed. Used basically for working with the multiline textual input data.
@@ -63,7 +64,7 @@ generalF
  -> String -- ^ An initial string to be analysed.
  -> [String] 
  -> IO [String]
-generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb file numTest hc (grps,mxms) k descending hashStep emptyline splitting (fs,code) concurrently initstr universalSet@(_:_:_) = do
+generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lineNmb file numTest hc (grps,mxms) k descending hashStep emptyline splitting (fs,code) concurrently initstr universalSet@(_:_:_) = do
    syllableDurationsDs <- readSyllableDurations file
    let syllN = countSyll initstr
        f ldc compards syllableDurationsDs grps mxms -- Since the version 0.12.0.0, has a possibility to evaluate diversity property.
@@ -71,10 +72,10 @@ generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb file 
                          else  if length syllableDurationsDs >= k then syllableDurationsDs !! (k - 1) else syllableDurationsD2) . createSyllablesUkrS) 
             | otherwise = fromIntegral . diverse2GGL (selectSounds selStr) [100,101] . convertToProperUkrainianI8 . filter (\c -> not (isDigit c) && c /= '_' && c/= '=')
    hSetNewlineMode stdout universalNewlineMode
-   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]-> Bool) compards then testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet
+   if numTest >= 0 && numTest <= 179 && numTest /= 1 && doubleFunc (L.null::[Word8]->Bool) (L.null::[Int8]-> Bool) compards then testsOutput concurrently syllN filtering f ldc syllableDurationsDs numTest universalSet
    else let sRepresent = zipWith (\k (x, ys) -> S k x ys) [1..] . 
                    (if descending then sortOn (\(u,w) -> (Down u, w)) else sortOn id) . map (\xss -> (f ldc compards syllableDurationsDs grps mxms xss, xss)) $ universalSet
-            strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) (if html then "<br>" else "") (jjj splitting) $ sRepresent
+            strOutput = force . (:[]) . halfsplit1G (\(S _ y _) -> y) filtering (if html then "<br>" else "") (jjj splitting) $ sRepresent
                         in do
                              let lns1 = unlines strOutput
                              putStrLn lns1
@@ -94,10 +95,10 @@ generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb file 
                              if code == -1 
                                  then if lineNmb == -1 then return strOutput
                                       else do 
-                                          print23 prestr poststr 1 [initstr]
+                                          print23 filtering prestr poststr 1 [initstr]
                                           return strOutput
                                  else do 
-                                       print23 prestr poststr 1 [initstr]
+                                       print23 filtering prestr poststr 1 [initstr]
                                        parseLineNumber l1 >>= \num -> do
                                          permiss <- getPermissions fs
                                          let writ = writable permiss
@@ -111,10 +112,10 @@ generalF power10 ldc compards html dcfile selStr (prestr, poststr) lineNmb file 
                   | r1 == 1 || r1 == 3 = 10*q1 + (if emptyline then 5 else r1)
                   | r1 < 0 = -10*q1 + (if emptyline then -4 else r1)
                   | otherwise = 10*q1 + (if emptyline then 4 else r1)
-generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ [u1] = do
+generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ [u1] = do
       putStrLn u1
       return [u1]
-generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ = let strOutput = ["You have specified the data and constraints on it that lead to no further possible options.", "Please, specify another data and constraints."] in do 
+generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ = let strOutput = ["You have specified the data and constraints on it that lead to no further possible options.", "Please, specify another data and constraints."] in do 
     putStrLn . unlines $ strOutput
     return strOutput
 
@@ -173,13 +174,14 @@ testsOutput
   :: (Show a1, Integral a1) =>
      Bool -- ^ Whether to run tests concurrently or not. 'True' corresponds to concurrent execution that can speed up the getting results but use more resources.
      -> Int
+     -> Bool  -- ^ Whether to filter out all groups of \'={digits}\' from the lines.
      -> (Int -> Compards -> p2 -> Int8 -> [Int8] -> String -> a1)
      -> Int
      -> p2
      -> Int
      -> [String]
      -> IO [String]
-testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet = do
+testsOutput concurrently syllN filtering f ldc syllableDurationsDs numTest universalSet = do
      putStrLn "Feet   Val  Stat   Proxim" 
      (if concurrently 
           then mapConcurrently
@@ -189,12 +191,12 @@ testsOutput concurrently syllN f ldc syllableDurationsDs numTest universalSet = 
                               mx = f ldc (C1 []) syllableDurationsDs q qs max1 
                               strTest = (show (fromEnum q) `mappend` "   |   " `mappend`  show mx `mappend` "     " `mappend` show m `mappend` "  -> " `mappend` 
                                   showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%" `mappend` (if rem numTest 10 >= 4 
-                                                                                                                          then ("\n" `mappend` min1 `mappend` "\n" `mappend` max1 `mappend` "\n")
+                                                                                                                          then ("\n" `mappend` (if filtering then removeChangesOfDurations else id) min1 `mappend` "\n" `mappend`  (if filtering then removeChangesOfDurations else id) max1 `mappend` "\n")
                                                                                                                           else "")) in putStrLn strTest >> return strTest) . zip (sel2 numTest) $ (sel numTest)
 
 -- | Part of 'generalF' for processment with a file.
 outputWithFile
-  :: String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
+     :: String -- ^ If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
      -> Compards -- ^ A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
      -> [AftovolioUkr]
      -> FilePath -- ^ The file to read the sound representation durations from.

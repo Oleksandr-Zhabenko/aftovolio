@@ -950,11 +950,11 @@ Therefore, for the Ukrainian language it is appropriate to use =13 or similar va
 
 See, for example:
 
-    aftovolioUkr +r 21 +w 54 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
+    aftovolioUkr -e +r 21 +w 54 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
     \...
-    8  садок=133 вишне=133вий ко=133лоха=133ти надви=133шнями гудуть=133 хрущі=133   711
+    8  садок вишневий колохати надвишнями гудуть хрущі   711
     
-as the element with the maximum value. The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
+as the element with the maximum value (since the 0.4.0.0 version the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
 
 You can easily paste the =133 group into the text in many editors or on the command line directly.
 
@@ -971,25 +971,25 @@ be read more dynamically.
 
 SYNOPSIS:
 
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] Ukrainian textual line
 
 OR:
 - aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+n] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]
 
 OR:
 - aftovolioUkr [-cm <FilePath to write the resulting combined output to> <FilePaths of the files to be compared and chosen the resulting options line-by-line>]
@@ -1038,6 +1038,8 @@ in Ukrainian.
 - +ln \... -ln     — if present and has inside a sequence of positive Word8 values not greater than 255 then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +ln \... -ln is present.
 
 - +di     — if present implies the "differentiation" mode of computation for the comparing options with the line in +l2\.\.\.-l2 or +ln\.\.\.-ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines.
+
+- -e     — if present suppresses the printing of "={digits}" in the line option to the screen. Is used for better readability, often with +di.
 
 - +q      — if present with +l2 \... -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.
 
