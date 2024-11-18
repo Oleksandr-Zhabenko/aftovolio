@@ -27,3 +27,8 @@
 ## 0.4.0.0 -- 2024-10-22
 
 * Fourth version. Added new command line parameter "-e" to control whether to print groups of "={digits}" on the screen while making output. Changed the number of arguments in various functions. 
+
+## 0.5.0.0 -- 2024-11-18
+
+* Fifth version. Removed +n command line parameter and the descending sorting of the resulting data. Changed the printing behaviour so that there is no longer too long half of the columns as empty one printed. Some code simplification in the module Aftovolio.Halfsplit. Added new constraint type G for specifying that more than two elements should be groupped together as a one whole (with possible inner permutations inside the group) during all the permutations.
+

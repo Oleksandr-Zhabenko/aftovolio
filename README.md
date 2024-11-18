@@ -1,4 +1,4 @@
-# aftovolio-ukrainian
+# AFTOVolio
 
 Author and [software
 developer:](https://hackage.haskell.org/package/aftovolio-ukrainian)
@@ -6,7 +6,7 @@ Oleksandr Zhabenko
 
 # Introduction
 
-Here is a brief introduction of AFTOVolio ideas and usage (that is Dutch 'Aanpak van Fonetische Talen voor het Ontdekken van de VOorkeursLIjnOpties' (Dutch people consider ji as a one letter and consequently one sound, but we use just first one for good readability) — Phonetic Languages Approach for Discovering the Preferred Line Options).
+Here is a brief introduction of AFTOVolio ideas and usage (that is Dutch 'Aanpak van Fonetische Talen voor het Ontdekken van de VOorkeursLIjnOpties' (Dutch people consider ij as a one letter and consequently one sound, but we use just first one for good readability) — 'Phonetic Languages Approach for Discovering the Preferred Line Options').
 
 Using AFTOVolio lets a person learn how to write the texts with the desired properties in pronunciation. 
 
@@ -421,8 +421,7 @@ concatenation of words that have a close grammatical connection, so as
 not to break them in the analysis. For the general case, it should be
 borne in mind that auxiliar or dependent words can go after the
 independent or the main, so this should be considered separately (and
-attach such words to the previous, not to the next). Currently, the
-generalized version of aftovolio-general-simple supports both.
+attach such words to the previous, not to the next).
 
 ## Advice how to use the programs
 
@@ -624,6 +623,16 @@ detail below.
     symbolic notation, Iabc == Ibac. Also, Dabc + Dbac == Iabc. A
     generalisation of the W constraint, where the user can specify their
     own distance between words.
+
+-   Constraint G --- (Groupped together) --- two unequal digits, each of
+    them indicates the sequence number of the first and the last elements
+    of the group of words or their concatenations that should be groupped 
+    together as a one whole (with possible inner permutations inside 
+    the group) during all the permutations. Is useful mostly for some 
+    syntactic constructions such as a sentence or a phrase. The inner 
+    counting are not implemented yet and probably will be implemented in
+    the future releases. Now the group is just used as a non-interrupted
+    groupping of the words to be preserved as a one whole.
 
 ## Simple linear \"AND\" logic
 
@@ -954,7 +963,7 @@ See, for example:
     \...
     8  садок вишневий колохати надвишнями гудуть хрущі   711
     
-as the element with the maximum value (since the 0.4.0.0 version the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
+as the element with the maximum value (the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
 
 You can easily paste the =133 group into the text in many editors or on the command line directly.
 
@@ -971,36 +980,34 @@ be read more dynamically.
 
 SYNOPSIS:
 
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [+r <groupping info>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+c <HashCorrections encoded>] [-e] [+l] [+d <FilePath to file with durations>] [+k <number - hash step>] [-t <number of the test or its absence if 1 is here> [-C +RTS -N -RTS]] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+x <maximum number of words taken>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+n] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [+ul <diversity property encoding string>] [+l] [-p] [+w <splitting parameter>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>]] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+l2 <a Ukrainian text line to compare similarity with> -l2]] [+di] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] Ukrainian textual line
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+ln <a sequence of positive Word8 values not greater than 255 e. g. 24 157 45 68 45 56 59 to compare similarity with> -ln]] [+di] Ukrainian textual line
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m <FilePath> <num1> +m2 <num2>]]
 
 OR:
-- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+n] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]
+- aftovolioUkr [[+a <AFTOVolio constraints> -a] [+b <extended algebraic AFTOVolio constraints> -b] [-e] [+l] [+d <FilePath to file with durations>] [+s <syllable durations function number>] [-p] [+w <splitting parameter>] [+q <power of 10 for multiplier in [2..6]>] [+f <FilePath to the file to be appended the resulting String> <control parameter for output parts>] [+x <maximum number of words taken>] [+dc <whether to print <br> tag at the end of each line for two-column output> <FilePath to the file where the two-column output will be written in addition to stdout>] [+di] [+m3 <FilePath> <num1> <num2>]]
 
 OR:
 - aftovolioUkr [-cm <FilePath to write the resulting combined output to> <FilePaths of the files to be compared and chosen the resulting options line-by-line>]
 
 ### Executable commandline parameters and their meaning
 
-- +n      — if specified then the order of sorting and printing is descending (the reverse one to the default otherwise).
-
 - +l      — if specified then the output for one property (no tests) contains empty lines between the groups of the line option with the same value of property.
 
-- +w      — if specified with the next Int8 number then the splitting of the output for non-testing options is used. Is used when no "-t" argument is given. The output is splitten into two columns to improve overall experience. The parameter after the "+w" is divided by 10 (-10 for negative numbers) to obtain the quotient and remainder (Int8 numbers). The quotient specifies the number of spaces or tabular characters to be used between columns (if the parameter is positive then the spaces are used, otherwise tabular characters). The remainder specifies the option of displaying. If the absolute value of the remainder (the last digit of the parameter) is 1 then the output in the second column is reversed; if it is in the range [2..5] then the output is groupped by the estimation values: if it is 2 then the first column is reversed; if it is 3 then the second column is reversed; if it is 4 then like 2 but additionally the empty line is added between the groups; if it is 5 then like for 3 and additionally the empty line is added between the groups. Otherwise, the second column is reversed. The rules are rather complex, but you can give a try to any number (Int8, [129..128] in the fullscreen terminal). The default value is 50 that corresponds to some reasonable layout.
+- +w      — if specified with the next Int8 number then the splitting of the output for non-testing options is used. Is used when no "-t" argument is given. The output is split into two columns to improve overall experience. The parameter after the "+w" is divided by 10 (-10 for negative numbers) to obtain the quotient and remainder (Int8 numbers). The quotient specifies the number of spaces or tabular characters to be used between columns (if the parameter is positive then the spaces are used, otherwise tabular characters). The remainder specifies the option of displaying. If the absolute value of the remainder (the last digit of the parameter) is 1 then the output in the second column is reversed; if it is in the range [2..5] then the output is groupped by the estimation values: if it is 2 then the first column is reversed; if it is 3 then the second column is reversed; if it is 4 then like 2 but additionally the empty line is added between the groups; if it is 5 then like for 3 and additionally the empty line is added between the groups. Otherwise, the second column is reversed. The rules are rather complex, but you can give a try to any number (Int8, [129..128] in the fullscreen terminal). The default value is 50 that corresponds to some reasonable layout.
 
 - +s      — the next is the digit from 1 to 4 included. The default one is 2. Influences the result in the case of +d parameter is not given.
 
@@ -1045,7 +1052,7 @@ in Ukrainian.
 
 - +ul     — afterwards there is a string that encodes which sounds are used for diversity property evaluation. If used, then +r group has no meaning and is not used. Unlike in the link, the argument "1" means computing the property for all the sound representations included (for all of the present representations, so the value is maximal between all other strings instead of "1"). For more information, [see](https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types)
 
-- +r      — afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: "543" means that the line is splitted into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7\...2. The values less than the lowest minimum are neglected.
+- +r      — afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: "543" means that the line is split into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7\...2. The values less than the lowest minimum are neglected.
 
 - +c      — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.3.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that theee corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
 
