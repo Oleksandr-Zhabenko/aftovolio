@@ -36,3 +36,7 @@
 
 * Fifth version revised A. Fixed issue with eternal loop in the halfsplit1G function.
 
+## 0.5.1.0 -- 2024-11-19
+
+* Fifth version revised B. Fixed documentation to reveal the latest changes.
+

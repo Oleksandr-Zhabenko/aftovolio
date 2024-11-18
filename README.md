@@ -1011,34 +1011,18 @@ OR:
 
 - +s      — the next is the digit from 1 to 4 included. The default one is 2. Influences the result in the case of +d parameter is not given.
 
-- +d      — if present, then afterwards should be a FilePath to the file with new durations of the Ukrainian AFTOVolio representations. They can be obtained using the information in the manual by [the link](https://oleksandr-zhabenko.github.io/uk/rhythmicity/aftovolioEng.7.pdf#page=12) and the 2 next pages in the pdf file, besides on [the page](https://hackage.haskell.org/package/r-glpk-phonetic-languages-ukrainian-durations) and on [the commentaries here](https://hackage.haskell.org/package/aftovolio-ukrainian-shared-0.5.0.0/docs/Phladiprelio-Ukrainian-ReadDurations.html#v:readSound8ToWord8) with the last one having priority.
+- +d      — if present, then afterwards should be a FilePath to the file with new durations of the Ukrainian AFTOVolio representations. They can be obtained using the information in the manual by [the link](https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioEng.7.pdf#page=12) and the 2 next pages in the pdf file, besides on [the page](https://hackage.haskell.org/package/r-glpk-phonetic-languages-ukrainian-durations) and on [the commentaries here](https://hackage.haskell.org/package/aftovolio-0.5.1.0/docs/Aftovolio-Ukrainian-ReadDurations.html#v:readSound8ToWord8) with the last one having priority.
 
 - -p      — if present the minimal grammar transformations (appending and prepending the dependent parts) are not applied. Can be useful also if the text is analyzed as a Ukrainian transcription of text in some other language.
 
 - +f      — if present with two arguments specifies the file to which the output information should be appended and the mode of appending (which parts to write). The default value if the secodnd parameter is 0 or not element of [1,2,3,4,10,11,12,13,14,15,16,17,18,19] is just the resulting String option. If the second parameter is 1 then the sequential number and the text are written; if it is 2 then the estimation value and the string are written; if it is 3 then the full information is written i. e. number, string and estimation; if it is 4 then the number and estimation (no string).
-The second arguments greater or equal to 10 take effect only if the meter consists of two syllables (in case of "+r 21" command line options given). If it is 10 in such a case then before appending the line option itself to the given file there is hashes information for this line option displayed. If it is 11 — the same hashes information is displayed before processing as for 1. If it is 12 — the same hashes information is displayed before processing as for 2 and so on for 13, 14. If it is 15 up to 19 — it is analogically to the the 10–14 but the hashes information is not only printed on the screen, but appended to the file specified. These values are intended to test the interesting hypothesis about where the pauses can occur. For more information on the hypothesis, see:
-
-https://www.academia.edu/105067761/Why_some_lines_are_easy_to_pronounce_and_others_are_not_or_prosodic_unpredictability_as_a_characteristic_of_text
+The second arguments greater or equal to 10 take effect only if the meter consists of two syllables (in case of "+r 21" command line options given). If it is 10 in such a case then before appending the line option itself to the given file there is hashes information for this line option displayed. If it is 11 — the same hashes information is displayed before processing as for 1. If it is 12 — the same hashes information is displayed before processing as for 2 and so on for 13, 14. If it is 15 up to 19 — it is analogically to the the 10–14 but the hashes information is not only printed on the screen, but appended to the file specified. These values are intended to test the interesting hypothesis about where the pauses can occur. For more information on the hypothesis, see above.
 
 - +dc     — if specified with two further arguments then the first one can be 1 or something  else. If it is 1 then additionally to every line as usual there is printed also <br> html tag at the end of the line for the two-columns output. Otherwise, nothing is added to each line. The second argument further is a FilePath to the writable existing file or to the new file that will be located in the writable by the user directory. The two-column output will be additionally written to this file if it is possible, otherwise the program will end with an exception.
 
-- +a \... -a       — if present contains a group of constraints for AFTOVolio. For more information, see:
+- +a \... -a       — if present contains a group of constraints for AFTOVolio. For more information, see above.
 
-https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#constraints 
-
-in English or in Ukrainian:
-
-https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Ukr.21.html#%D0%BE%D0%B1%D0%BC%D0%B5%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F-constraints
-
-- +b \... -b       — if present takes precedence over those ones in the +a \... -a group (the latter ones have no effect). A group of constraints for AFTOVolio using some boolean-based algebra. If you use parentheses there, please, use quotation of the whole expression between the +b and -b (otherwise there will be issues with the shell or command line interpreter related to parentheses). For example, on Linux bash or Windows PowerShell: +b 'P45(A345 B32)' -b. If you use another command line environment or interpreter, please, refer to the documentation for your case about the quotation and quotes. For more information, see:
-
-https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioEng.7.pdf 
-
-in English or:
-
-https://oleksandr-zhabenko.github.io/uk/rhythmicity/phladiprelioUkr.7.pdf 
-
-in Ukrainian.
+- +b \... -b       — if present takes precedence over those ones in the +a \... -a group (the latter ones have no effect). A group of constraints for AFTOVolio using some boolean-based algebra. If you use parentheses there, please, use quotation of the whole expression between the +b and -b (otherwise there will be issues with the shell or command line interpreter related to parentheses). For example, on Linux bash or Windows PowerShell: +b 'P45(A345 B32)' -b. If you use another command line environment or interpreter, please, refer to the documentation for your case about the quotation and quotes. For more information, see above.
 
 - +l2 \... -l2     — if present and has inside Ukrainian text then the line options are compared with it using the idea of lists similarity. The greater values correspond to the less similar and more different lines. Has no effect with +dc group of command line arguments. Has precedence over +t, +r, +k, +c etc. groups of command line options so that these latter ones have no effect when +l2 \... -l2 is present.
 
@@ -1057,8 +1041,8 @@ in Ukrainian.
 - +c      — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.3.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that theee corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
 
 - -t      — and afterwards the number in the range [0..179] (with some exceptions) showing the test for 'smoothness' (to be more accurate - absence or presence of some irregularities that influences the prosody) to be run - you can see a list of possible values for the parameter here at the link:
-[link1](https://hackage.haskell.org/package/aftovolio-ukrainian-simple-0.6.0.0/src/app/Main.hs)  on the lines number: 51; 56-115; 118-126. The first section of the lines numbers 56-63 and 120 corresponds to the detailed explanation below.
-For ideas of actual usage of the tests, see the documentation by [the link](https://www.academia.edu/105067723/%D0%A7%D0%BE%D0%BC%D1%83_%D0%B4%D0%B5%D1%8F%D0%BA%D1%96_%D1%80%D1%8F%D0%B4%D0%BA%D0%B8_%D0%BB%D0%B5%D0%B3%D0%BA%D0%BE_%D0%B2%D0%B8%D0%BC%D0%BE%D0%B2%D0%BB%D1%8F%D1%82%D0%B8_%D0%B0_%D1%96%D0%BD%D1%88%D1%96_%D0%BD%D1%96_%D0%B0%D0%B1%D0%BE_%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B4%D0%B8%D1%87%D0%BD%D0%B0_%D0%BD%D0%B5%D1%81%D0%BF%D1%80%D0%BE%D0%B3%D0%BD%D0%BE%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D1%96%D1%81%D1%82%D1%8C_%D1%8F%D0%BA_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0_%D1%82%D0%B5%D0%BA%D1%81%D1%82%D1%83?source=swp_share) and [link2](https://www.academia.edu/105067761/Why_some_lines_are_easy_to_pronounce_and_others_are_not_or_prosodic_unpredictability_as_a_characteristic_of_text)
+[link1](https://hackage.haskell.org/package/phladiprelio-ukrainian-simple-0.6.0.0/src/app/Main.hs)  on the lines number: 51; 56-115; 118-126. The first section of the lines numbers 56-63 and 120 corresponds to the detailed explanation below.
+For ideas of actual usage of the tests, see the documentation above.
 
 - -C      — If specified with +RTS -N -RTS rtsoptions for the multicore computers with -t option then it can speed up the full computation of the all tests using more resources. Uses asynchcronous concurrent threads in computation. This groups (-C and rtsoptions) can be specified in any position as command line groups of arguments. The output is in this case not sorted in the order of 2,3,4,5,6,7, but can vary depending on your CPU configurations and states and / or some other factors.
 
@@ -1088,6 +1072,6 @@ If you specify \_1, \_10, \_100, \_1000, etc. as such an insertion, the program 
 
 For the "music" mode the number of syllables printed for the line does include the inserts.
 
-- -cm     — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. The total number of sources is limited to no more than 14. For more information, please refer to [the link](https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#comparative-mode-of-operation-c)
+- -cm     — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. The total number of sources is limited to no more than 14.
 
 
