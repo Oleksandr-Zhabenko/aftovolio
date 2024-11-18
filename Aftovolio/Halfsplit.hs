@@ -20,6 +20,7 @@ import GHC.Num (abs, (+), (-))
 import GHC.Real (quot, quotRem)
 import System.IO (getLine, putStr, putStrLn)
 import Text.Show (Show (..))
+import Debug.Trace
 
 -- | Converts the data that is an instance of 'Show' typeclass to be printed in two-column way.
 halfsplit ::
@@ -74,13 +75,13 @@ halfsplit1G g filtering appendstr m xs
     (y100s, t10s) = splitAt l2 . concat $ rss
     y10s 
         | r20 == 0 = y100s
-        | otherwise = replicate l0 ' ' : y10s
+        | otherwise = replicate l0 ' ' : y100s
     r1ss = intersperse [replicate l0 ' '] rss -- For groupping with empty lines
     (l3, r30) = (sum . map length $ r1ss) `quotRem` 2
     (y200s, t20s) = splitAt l3 . concat $ r1ss
     y20s
         | r30 == 0 = y200s
-        | otherwise = replicate l0 ' ' : y20s
+        | otherwise = replicate l0 ' ' : y200s
  
 -- | A generalized version of 'halfsplit3G' with the possibility to prepend and append strings to it. These 'String's are not filtered out for the groups of \'={digits}\' from the prepending and appending 'String's.
 halfsplit2G ::

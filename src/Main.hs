@@ -124,7 +124,6 @@ main = do
         gcd1 = gcd le lb
         ldc = (le * lb) `quot` gcd1
         mulp = ldc `quot` lb
---        max2 = maximum basecomp
         compards = let ff g1 g2 ks = if isWord8Based ks then C1 . g1 . (\(C1 us) -> us) $ ks else  C2 . g2 . (\(C2 us) -> us) $ ks in ff (concatMap (replicate mulp)) (concatMap (replicate mulp)) basecomp
         (filesave,codesave)  
           | null filedata = ("",-1)
@@ -137,7 +136,6 @@ main = do
           | not (null argCBs) = filterGeneralConv l argCBs . genPermutationsL $ l
           | null argCs = genPermutationsL l
           | otherwise = decodeLConstraints argCs . genPermutationsL $ l 
---        descending = oneA "+n" argsA
         variants1 = force . uniquenessVariants2GNBL ' ' id id id perms $ ll
     if helpMessage then do 
       hSetNewlineMode stdout universalNewlineMode

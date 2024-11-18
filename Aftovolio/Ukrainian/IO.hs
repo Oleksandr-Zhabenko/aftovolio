@@ -60,7 +60,7 @@ import System.IO (
     writeFile,
  )
 import Text.Read (readMaybe)
-import Text.Show (Show (..))
+--import Text.Show (Show (..))
 
 generalF ::
     -- | A power of 10. The distance value is quoted by 10 in this power if the next ['Word8'] argument is not empty. The default one is 0. The right values are in the range [0..4].
