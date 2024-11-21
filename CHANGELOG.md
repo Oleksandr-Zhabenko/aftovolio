@@ -40,3 +40,7 @@
 
 * Fifth version revised B. Fixed documentation to reveal the latest changes.
 
+## 0.6.0.0 -- 2024-11-21
+
+* Sixth version. Added new module Aftovolio.PermutationsArrMini2. Added new command line argument "+P <non-negative Int, presumably in the range 0..3>", which specifies the general type of permutations of the words and their concatenations. +P 0 corresponds the full set of all possible permutations (the default behaviour, also in case of no specification at all), +P 1 corresponds to the set of permutations, where just one word can change its position (the elementary, the least possible permutation), +P 2 corresponds to the set of permutations, where two words can be swapped one with another, +P 3 corresponds to the set of permutations, where no more than two words can change their positions, including the cases of no changes at all and just one word changes its position. All, except +P 0 provide less permutations in general and are quicker to be computed and displayed. This one is more useful in case of extended sets of words, e. g. when there are 8 or 9 words in the line. Fixed issue with genPermutations function. Some minor code and documentation improvements.
+

@@ -12,8 +12,12 @@ import Aftovolio.General.Distance
 import Aftovolio.General.PrepareText
 import Aftovolio.General.Syllables
 import Aftovolio.Halfsplit
-import Aftovolio.PermutationsArr
 import Aftovolio.StrictVG
+import Aftovolio.PermutationsArr
+import Aftovolio.PermutationsArrMini1
+import Aftovolio.PermutationsArrMini2
+import Aftovolio.PermutationsArrMini
+import Aftovolio.PermutationsRepresent
 import Aftovolio.Tests
 import Aftovolio.UniquenessPeriodsG
 import CLI.Arguments
@@ -445,10 +449,11 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
                 l = length ll
                 argCs = catMaybes (fmap (readMaybeECG l) . getC "+a" $ argsC)
                 argCBs = unwords . getC "+b" $ argsC -- If you use the parenthese with +b ... -b then consider also using the quotation marks for the whole algebraic constraint. At the moment though it is still not working properly for parentheses functionality. The issue should be fixed in the further releases.
+                permutationsType = bTransform2Perms . getB "+P" $ argsB
                 !perms
-                    | not (L.null argCBs) = filterGeneralConv l argCBs . genPermutationsL $ l
-                    | L.null argCs = genPermutationsL l
-                    | otherwise = decodeLConstraints argCs . genPermutationsL $ l
+                    | not (L.null argCBs) = filterGeneralConv l argCBs . permChoose permutationsType $ l
+                    | L.null argCs = permChoose permutationsType l
+                    | otherwise = decodeLConstraints argCs . permChoose permutationsType $ l
                 basiclineoption = unwords arg3s
                 example =
                     (if differentiate then C2 . fromSmallWord8toInt8Diff else C1)
@@ -583,6 +588,7 @@ bSpecs =
     , ("+dc", 2)
     , ("+q", 1)
     , ("-cm", 1)
+    , ("+P", 1)
     ]
 
 -- | 'selectSounds' converts the argument after \"+ul\" command line argument into a list of sound representations that is used for evaluation of \'uniqueness periods\' properties of the line. Is a modified Phonetic.Languages.Simplified.Array.General.FuncRep2RelatedG2.parsey0Choice from the @phonetic-languages-simplified-generalized-examples-array-0.19.0.1@ package.

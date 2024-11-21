@@ -64,7 +64,7 @@ universalSetGL ts uss f1 f2 permsL baseArr =
     #-}
 
 genPermutations :: (Ord a, Enum a, Num a) => Int -> Array Int [a]
-genPermutations n = listArray (0, L.product [1 .. (n - 1)]) . L.permutations . take n $ [0 ..]
+genPermutations n = listArray (0, L.product [1 .. n] - 1) . L.permutations . take n $ [0 ..]
 {-# INLINE genPermutations #-}
 {-# SPECIALIZE genPermutations :: Int -> Array Int [Int] #-}
 

@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               aftovolio
-version:            0.5.1.1
+version:            0.6.0.0
 
 -- A short (one-line) description of the package.
 synopsis:           An AFTOVolio implementation for creating texts with special phonetic / prosodic properties.
@@ -24,7 +24,7 @@ extra-source-files: CHANGELOG.md, README.md, controlDataExample.txt, gwrsysExamp
 
 library
     -- Modules included in this executable, other than Main.
-    exposed-modules:  Aftovolio.Ukrainian.Common2, Aftovolio.Ukrainian.IO, Aftovolio.Ukrainian.PrepareText, Aftovolio.Ukrainian.ReverseConcatenations, Aftovolio.DataG, Aftovolio.StrictVG, Aftovolio.Partir, Data.ChooseLine2, Aftovolio.PermutationsArr, Aftovolio.PermutationsArrMini, Aftovolio.PermutationsArrMini1, Aftovolio.PermutationsRepresent, Aftovolio.Constraints, Aftovolio.ConstraintsEncoded, Aftovolio.Tests, Aftovolio.Ukrainian.Syllable, Aftovolio.Ukrainian.Melodics, Aftovolio.Ukrainian.SyllableWord8, Aftovolio.Basis, Aftovolio.UniquenessPeriodsG, Aftovolio.Coeffs, Aftovolio.Ukrainian.ReadDurations, Aftovolio.General.Datatype3, Aftovolio.General.Distance, Aftovolio.Halfsplit, Aftovolio.General.Parsing, Aftovolio.General.Base, Aftovolio.General.PrepareText, Aftovolio.General.Simple, Aftovolio.General.SpecificationsRead, Aftovolio.General.Syllables, Aftovolio.RGLPK.General 
+    exposed-modules:  Aftovolio.Ukrainian.Common2, Aftovolio.Ukrainian.IO, Aftovolio.Ukrainian.PrepareText, Aftovolio.Ukrainian.ReverseConcatenations, Aftovolio.DataG, Aftovolio.StrictVG, Aftovolio.Partir, Data.ChooseLine2, Aftovolio.PermutationsArr, Aftovolio.PermutationsArrMini, Aftovolio.PermutationsArrMini2, Aftovolio.PermutationsArrMini1, Aftovolio.PermutationsRepresent, Aftovolio.Constraints, Aftovolio.ConstraintsEncoded, Aftovolio.Tests, Aftovolio.Ukrainian.Syllable, Aftovolio.Ukrainian.Melodics, Aftovolio.Ukrainian.SyllableWord8, Aftovolio.Basis, Aftovolio.UniquenessPeriodsG, Aftovolio.Coeffs, Aftovolio.Ukrainian.ReadDurations, Aftovolio.General.Datatype3, Aftovolio.General.Distance, Aftovolio.Halfsplit, Aftovolio.General.Parsing, Aftovolio.General.Base, Aftovolio.General.PrepareText, Aftovolio.General.Simple, Aftovolio.General.SpecificationsRead, Aftovolio.General.Syllables, Aftovolio.RGLPK.General 
 
     -- LANGUAGE extensions used by modules in this package.
     other-extensions: NoImplicitPrelude, BangPatterns, DeriveGeneric, StrictData
@@ -36,7 +36,7 @@ executable aftovolioUkr
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules:    Aftovolio.Ukrainian.Common2, Aftovolio.Ukrainian.IO, Aftovolio.Ukrainian.PrepareText, Aftovolio.Ukrainian.ReverseConcatenations, Aftovolio.DataG, Aftovolio.StrictVG, Aftovolio.Partir, Data.ChooseLine2, Aftovolio.PermutationsArr, Aftovolio.PermutationsArrMini, Aftovolio.PermutationsArrMini1, Aftovolio.PermutationsRepresent, Aftovolio.Constraints, Aftovolio.ConstraintsEncoded, Aftovolio.Tests, Aftovolio.Ukrainian.Syllable, Aftovolio.Ukrainian.Melodics, Aftovolio.Ukrainian.SyllableWord8, Aftovolio.Basis, Aftovolio.UniquenessPeriodsG, Aftovolio.Coeffs, Aftovolio.Ukrainian.ReadDurations, Aftovolio.General.Datatype3, Aftovolio.General.Distance, Aftovolio.Halfsplit, Aftovolio.General.Parsing, Aftovolio.General.Base, Aftovolio.General.PrepareText, Aftovolio.General.Simple, Aftovolio.General.SpecificationsRead, Aftovolio.General.Syllables, Aftovolio.RGLPK.General
+    other-modules:    Aftovolio.Ukrainian.Common2, Aftovolio.Ukrainian.IO, Aftovolio.Ukrainian.PrepareText, Aftovolio.Ukrainian.ReverseConcatenations, Aftovolio.DataG, Aftovolio.StrictVG, Aftovolio.Partir, Data.ChooseLine2, Aftovolio.PermutationsArr, Aftovolio.PermutationsArrMini, Aftovolio.PermutationsArrMini2, Aftovolio.PermutationsArrMini1, Aftovolio.PermutationsRepresent, Aftovolio.Constraints, Aftovolio.ConstraintsEncoded, Aftovolio.Tests, Aftovolio.Ukrainian.Syllable, Aftovolio.Ukrainian.Melodics, Aftovolio.Ukrainian.SyllableWord8, Aftovolio.Basis, Aftovolio.UniquenessPeriodsG, Aftovolio.Coeffs, Aftovolio.Ukrainian.ReadDurations, Aftovolio.General.Datatype3, Aftovolio.General.Distance, Aftovolio.Halfsplit, Aftovolio.General.Parsing, Aftovolio.General.Base, Aftovolio.General.PrepareText, Aftovolio.General.Simple, Aftovolio.General.SpecificationsRead, Aftovolio.General.Syllables, Aftovolio.RGLPK.General
     ghc-options:      -threaded -rtsopts
     -- LANGUAGE extensions used by modules in this package.
     other-extensions: NoImplicitPrelude, BangPatterns, DeriveGeneric, StrictData
