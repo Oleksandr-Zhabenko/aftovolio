@@ -319,7 +319,7 @@ argsProcessing ::
     String ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
     String ->
-    -- | Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
     ([[[PRS]]] -> [[Word8]]) ->
     [[String]] ->
     [[String]] ->
@@ -509,7 +509,7 @@ processingF ::
     String ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
     String ->
-    -- | Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
     ([[[PRS]]] -> [[Word8]]) ->
     Int ->
     HashCorrections ->
@@ -653,7 +653,7 @@ testsOutput concurrently syllN filtering f ldc numTest universalSet = do
 
 -- | Internal part of the 'generalF' for processment with a file.
 outputWithFile ::
-    -- | Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
     ([[[PRS]]] -> [[Word8]]) ->
     -- | Data used to obtain the phonetic language representation of the text.
     GWritingSystemPRPLX ->
