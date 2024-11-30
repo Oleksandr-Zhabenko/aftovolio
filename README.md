@@ -369,8 +369,9 @@ Therefore, for the Ukrainian language it is appropriate to use =13 or similar va
 See, for example:
 
     aftovolioUkr -e +r 21 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
-    \.\.\.
+    ...
     8 садок вишневий колохати надвишнями гудуть хрущі  711
+    ...
  
 as the element with the maximum value (the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
 
