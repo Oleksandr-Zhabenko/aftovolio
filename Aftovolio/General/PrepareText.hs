@@ -59,8 +59,8 @@ import Data.Tuple (fst)
 
 -- | The lists in the list are sorted in the descending order by the word counts in the inner 'String's. All the 'String's
 -- in each inner list have the same number of words, and if there is no 'String' with some intermediate number of words (e. g. there
--- are 'String's for 4 and 2 words, but there is no one for 3 words 'String's) then such corresponding list is absent (since
--- the 0.9.0.0 version). Probably the maximum number of words can be not more than 4, and the minimum number is
+-- are 'String's for 4 and 2 words, but there is no one for 3 words 'String's) then such corresponding list is absent. 
+-- Probably the maximum number of words can be not more than 4, and the minimum number is
 -- not less than 1, but it depends. The 'String's in the inner lists must be (unlike the inner
 -- lists themselves) sorted in the ascending order for the data type to work correctly in the functions of the module.
 type Concatenations = [[String]]
@@ -68,7 +68,7 @@ type Concatenations = [[String]]
 type ConcatenationsArr = [Array Int (String,Bool)]
 
 defaultConversion :: Concatenations -> ConcatenationsArr
-defaultConversion ysss = map (f . filter (not . null)) . filter (not . null) $ ysss
+defaultConversion concatenations = map (f . filter (not . null)) . filter (not . null) $ concatenations
   where f :: [String] -> Array Int (String,Bool)
         f yss = let l = length yss in listArray (0,l-1) . zip yss . cycle $ [True]
 
@@ -79,8 +79,8 @@ defaultConversion ysss = map (f . filter (not . null)) . filter (not . null) $ y
 -- to avoid the misinterpretation and preserve maximum of the semantics for the
 -- \"phonetic\" language on the phonetic language basis.
 prepareText
-  :: [[String]] -- ^ Is intended to become a valid 'Concatenations'.
-  -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
+  :: [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+  -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word.
   -> String -- ^ A sorted 'String' of possible characters in the phonetic language representation.
   -> String
   -> [String]
@@ -99,7 +99,7 @@ sort2Concat xsss
 -----------------------------------------------------
 
 complexWords2 :: ConcatenationsArr -> String -> (String -> String,String)
-complexWords2 ysss@(yss:zsss) zs@(r:rs)
+complexWords2 concatArrsss@(yss:zsss) zs@(r:rs)
  | getBFst' (False, yss) . unwords $ tss = ((uwxs `mappend`), unwords uss)
  | otherwise = complexWords2 zsss zs
       where y = length . words . fst . unsafeAt yss $ 0
@@ -111,15 +111,15 @@ pairCompl :: (String -> String,String) -> (String,String)
 pairCompl (f,xs) = (f [],xs)
 
 splitWords :: ConcatenationsArr -> [String] -> String -> (String,String)
-splitWords ysss tss zs 
+splitWords concatArrsss tss zs 
   | null . words $ zs = (mconcat tss,[])
   | null ws = (\(xss,uss) -> (mconcat (tss `mappend` xss), unwords uss)) . splitAt 1 . words $ zs
-  | otherwise = splitWords ysss (tss `mappend` [ws]) us
-        where (ws,us) = pairCompl . complexWords2 ysss $ zs 
+  | otherwise = splitWords concatArrsss (tss `mappend` [ws]) us
+        where (ws,us) = pairCompl . complexWords2 concatArrsss $ zs 
 
 concatWordsFromLeftToRight :: ConcatenationsArr -> String -> [String]
-concatWordsFromLeftToRight ysss zs = let (ws,us) = splitWords ysss [] zs in
-  if null us then [ws] else ws : concatWordsFromLeftToRight ysss us
+concatWordsFromLeftToRight concatArrsss zs = let (ws,us) = splitWords concatArrsss [] zs in
+  if null us then [ws] else ws : concatWordsFromLeftToRight concatArrsss us
 
 -----------------------------------------------------
 
@@ -136,12 +136,12 @@ left2right = unwords . reverse . map reverse
 -- | A generalized variant of the 'prepareText' with the arbitrary maximum number of the words in the lines given as the first argument.
 prepareTextN
  :: Int -- ^ A maximum number of the words or their concatenations in the resulting list of 'String's.
- -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
- -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
+ -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+ -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word.
  -> String -- ^ A sorted 'String' of possible characters in the phonetic language representation.
  -> String
  -> [String]
-prepareTextN n ysss zsss xs = filter (any (isPLL xs)) . splitLinesN n . map (left2right .
+prepareTextN maxNumWords ysss zsss xs = filter (any (isPLL xs)) . splitLinesN maxNumWords . map (left2right .
   concatWordsFromLeftToRight (defaultConversion . sort2Concat . append2prependConv $ zsss) . left2right .
   concatWordsFromLeftToRight (defaultConversion . sort2Concat $ ysss)) . filter (not . null) . lines
 
@@ -163,67 +163,63 @@ splitLines = splitLinesN 7
 
 -- | A generalized variant of the 'splitLines' with the arbitrary maximum number of the words in the lines given as the first argument.
 splitLinesN :: Int -> [String] -> [String]
-splitLinesN n xss
- | null xss || n <= 0 = []
- | otherwise = mapI (\xs -> compare (length . words $ xs) n == GT) (\xs -> let yss = words xs in
-     splitLinesN n . map unwords . (\(q,r) -> [q,r]) . splitAt (shiftR (length yss) 1) $ yss) $ xss
+splitLinesN maxNumWords xss
+ | null xss || maxNumWords <= 0 = []
+ | otherwise = mapI (\xs -> compare (length . words $ xs) maxNumWords == GT) (\xs -> let yss = words xs in
+     splitLinesN maxNumWords . map unwords . (\(q,r) -> [q,r]) . splitAt (shiftR (length yss) 1) $ yss) $ xss
 
 ------------------------------------------------
 
-{-| @ since 0.8.0.0
-Given a positive number and a list tries to rearrange the list's 'String's by concatenation of the several elements of the list
+{-| Given a positive number and a list tries to rearrange the list's 'String's by concatenation of the several elements of the list
 so that the number of words in every new 'String' in the resulting list is not greater than the 'Int' argument. If some of the
 'String's have more than that number quantity of the words then these 'String's are preserved.
 -}
 growLinesN :: Int -> [String] -> [String]
-growLinesN n xss
- | null xss || n < 0 = []
- | otherwise = unwords yss : growLinesN n zss
-     where l = length . takeWhile (<= n) . scanl1 (+) . map (length . words) $ xss -- the maximum number of lines to be taken
+growLinesN maxNumWords xss
+ | null xss || maxNumWords < 0 = []
+ | otherwise = unwords yss : growLinesN maxNumWords zss
+     where l = length . takeWhile (<= maxNumWords) . scanl1 (+) . map (length . words) $ xss -- the maximum number of lines to be taken
            (yss,zss) = splitAt (max l 1) xss
 
-{-| @ since 0.8.0.0
-The function combines the 'prepareTextN' and 'growLinesN' function. Applies needed phonetic language preparations
+{-| The function combines the 'prepareTextN' and 'growLinesN' function. Applies needed phonetic language preparations
 to the text and tries to \'grow\' the resulting 'String's in the list so that the number of the words in every
 of them is no greater than the given first 'Int' number.
 -}
 prepareGrowTextMN
  :: Int -- ^ A maximum number of the words or their concatenations in the resulting list of 'String's.
  -> Int -- ^ A number of words in every 'String' that the function firstly forms. To have some sense of usage, must be less than the first argument.
- -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
- -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
+ -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+ -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word.
  -> String -- ^ A sorted 'String' of possible characters in the phonetic language representation.
  -> String
  -> [String]
-prepareGrowTextMN m n ysss zsss xs = growLinesN m . prepareTextN n ysss zsss xs
+prepareGrowTextMN maxNumWords firstNumWords ysss zsss xs = growLinesN maxNumWords . prepareTextN firstNumWords ysss zsss xs
 {-# INLINE prepareGrowTextMN #-}
 
 -------------------------------------
 
-{-| @ since 0.6.0.0
-Recursively splits the concatenated list of lines of words so that in every resulting 'String' in the list
+{-| Recursively splits the concatenated list of lines of words so that in every resulting 'String' in the list
 except the last one there is just 'Int' -- the first argument -- words.
 -}
 tuneLinesN :: Int -> [String] -> [String]
-tuneLinesN n xss
- | null xss || n < 0 = []
+tuneLinesN maxNumWords xss
+ | null xss || maxNumWords < 0 = []
  | otherwise =
     let wss = words . unwords $ xss
-        (yss,zss) = splitAt n wss
-          in unwords yss : tuneLinesN n zss
+        (yss,zss) = splitAt maxNumWords wss
+          in unwords yss : tuneLinesN maxNumWords zss
 
-{-| @ since 0.6.0.0
-The function combines the 'prepareTextN' and 'tuneLinesN' functions. Applies needed phonetic language preparations
+{-| The function combines the 'prepareTextN' and 'tuneLinesN' functions. Applies needed phonetic language preparations
 to the phonetic language text and splits the list of 'String's so that the number of the words in each of them (except the last one)
 is equal the given first 'Int' number.
 -}
 prepareTuneTextMN
   :: Int -- ^ A maximum number of the words or their concatenations in the resulting list of 'String's.
   -> Int -- ^ A number of words in every 'String' that the function firstly forms. To have some sense of usage, must be less than the first argument.
-  -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
-  -> [[String]] -- ^ Is intended to become a valid 'Concatenations'.
+  -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+  -> [[String]] -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word
   -> String -- ^ A sorted 'String' of possible characters in the phonetic language representation.
   -> String
   -> [String]
-prepareTuneTextMN m n ysss zsss xs = tuneLinesN m . prepareTextN n ysss zsss xs
+prepareTuneTextMN maxNumWords firstNumWords ysss zsss xs = tuneLinesN maxNumWords . prepareTextN firstNumWords ysss zsss xs
 {-# INLINE prepareTuneTextMN #-}

@@ -96,11 +96,11 @@ generalF ::
     CharPhoneticClassification ->
     SegmentRulesG ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
-    -- | Since the version 0.20.0.0, here there are 'Word8' instead of 'Double'. If this function is @g@, then the module 'Aftovolio.General.Datatype3' has corresponding function 'Aftovolio.General.Datatype3.zippedDouble2Word8' to transform the previously used function into the new one. If you have the function used inside the @f::[[[PRS]]]->[[Double]]@ with main conversion semantically similar to the one by the link: 'https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.7.1.1/docs/Phladiprelio-Ukrainian-SyllableDouble.html#v:syllableDurationsD', then you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)].
-    ([[[PRS]]] -> [[Word8]]) ->
+    AdditionalDelimiters ->
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PhoneticPhenomenonRep]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PhoneticPhenomenonRep, Double)] into [(PhoneticPhenomenonRep, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.2.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
+    ([[[PhoneticPhenomenonRep]]] -> [[Word8]]) ->
     Int ->
     HashCorrections ->
     (Int8, [Int8]) ->
@@ -115,7 +115,7 @@ generalF ::
     String ->
     [String] ->
     IO [String]
-generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, poststr) lineNmb wrs ks arr gs us vs h numTest hc (grps, mxms) hashStep emptyline splitting (fs, code) concurrently initstr universalSet
+generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, poststr) lineNmb writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h numTest hc (grps, mxms) hashStep emptyline splitting (fs, code) concurrently initstr universalSet
     | L.null universalSet = do
         let strOutput =
                 [ "You have specified the data and constraints on it that lead to no further possible options."
@@ -127,7 +127,7 @@ generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, posts
         putStrLn . unlines $ universalSet
         return universalSet
     | otherwise = do
-        let syllN = countSyll wrs arr us vs initstr
+        let syllN = countSyll writingSystem arrCharClassification basicSpaces additionalDelims initstr
             f ldc compards grps mxms
                 | L.null selStr =
                     ( if doubleFunc (L.null :: [Word8] -> Bool) (L.null :: [Int8] -> Bool) compards
@@ -141,12 +141,12 @@ generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, posts
                         . read3
                             (not . L.null . filter (not . isSpace))
                             1.0
-                            (mconcat . h . createSyllablesPL wrs ks arr gs us vs)
+                            (mconcat . h . createSyllablesPL writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims)
                 | otherwise =
                     fromIntegral
-                        . diverse2GGL (selectSounds selFun selStr) (us `mappend` vs)
+                        . diverse2GGL (selectSounds selFun selStr) (basicSpaces `mappend` additionalDelims)
                         . concatMap string1
-                        . stringToXG wrs
+                        . stringToXG writingSystem
                         . filter (\c -> not (isDigit c) && c /= '_' && c /= '=')
         hSetNewlineMode stdout universalNewlineMode
         if numTest
@@ -214,7 +214,7 @@ generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, posts
                                     let writ = writable permiss
                                         readab = readable permiss
                                     if writ && readab
-                                        then outputWithFile h wrs ks arr gs us vs selStr compards sRepresent code grps fs num
+                                        then outputWithFile h writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims selStr compards sRepresent code grps fs num
                                         else
                                             error
                                                 "The specified file cannot be used for appending the text! Please, specify another file!"
@@ -244,20 +244,20 @@ countSyll ::
     GWritingSystemPRPLX ->
     CharPhoneticClassification ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    AdditionalDelimiters ->
     String ->
     Int
-countSyll wrs arr us vs xs =
+countSyll writingSystem arrCharClassification basicSpaces additionalDelims xs =
     numUnderscoresSyll
         + ( fromEnum
                 . foldr (\x y -> if createsSyllable x then y + 1 else y) 0
-                . concatMap (str2PRSs arr)
+                . concatMap (str2PRSs arrCharClassification)
                 . words1
                 . mapMaybe g
                 . concatMap string1
-                . stringToXG wrs $
+                . stringToXG writingSystem $
                 xs
           )
   where
@@ -270,8 +270,8 @@ countSyll wrs arr us vs xs =
             xs
     g :: Char -> Maybe Char
     g x
-        | x `elem` us = Nothing
-        | x `notElem` vs = Just x
+        | x `elem` basicSpaces = Nothing
+        | x `notElem` additionalDelims = Just x
         | otherwise = Just ' '
     words1 xs = if L.null ts then [] else w : words1 s'' -- Practically this is an optimized version for this case 'words' function from Prelude.
       where
@@ -316,13 +316,13 @@ argsProcessing ::
     CharPhoneticClassification ->
     SegmentRulesG ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
-    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
-    ([[[PRS]]] -> [[Word8]]) ->
-    [[String]] ->
-    [[String]] ->
+    AdditionalDelimiters ->
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PhoneticPhenomenonRep]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PhoneticPhenomenonRep, Double)] into [(PhoneticPhenomenonRep, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.2.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
+    ([[[PhoneticPhenomenonRep]]] -> [[Word8]]) ->
+    [[String]] -> -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+    [[String]] -> -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word
     String ->
     -- | These ones are intended to be used inside 'generalF'.
     IO
@@ -344,7 +344,7 @@ argsProcessing ::
         , String
         , [String]
         )
-argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
+argsProcessing writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h ysss zsss xs = do
     args0 <- getArgs
     let (argsC, args) = takeCs1R ('+', '-') cSpecs args0
         (argsB, args11) = takeBsR bSpecs args
@@ -431,7 +431,7 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
                             . read3
                                 (not . L.null . filter (not . isSpace))
                                 1.0
-                                (mconcat . h . createSyllablesPL wrs ks arr gs us vs) $
+                                (mconcat . h . createSyllablesPL writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims) $
                             line2comparewith
                 (filesave, codesave)
                     | L.null filedata = ("", -1)
@@ -460,7 +460,7 @@ argsProcessing wrs ks arr gs us vs h ysss zsss xs = do
                         . read3
                             (not . L.null . filter (not . isSpace))
                             1.0
-                            (mconcat . h . createSyllablesPL wrs ks arr gs us vs)
+                            (mconcat . h . createSyllablesPL writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims)
                         . unwords $
                         arg3s
                 le = doubleFunc (length :: [Word8] -> Int) (length :: [Int8] -> Int) example
@@ -506,22 +506,22 @@ processingF ::
     CharPhoneticClassification ->
     SegmentRulesG ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
-    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
-    ([[[PRS]]] -> [[Word8]]) ->
+    AdditionalDelimiters ->
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PhoneticPhenomenonRep]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PhoneticPhenomenonRep, Double)] into [(PhoneticPhenomenonRep, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.2.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
+    ([[[PhoneticPhenomenonRep]]] -> [[Word8]]) ->
     Int ->
     HashCorrections ->
     (Int8, [Int8]) ->
-    [[String]] ->
-    [[String]] ->
+    [[String]] -> -- ^ Is intended to become a valid 'Concatenations' that are to be prepended to the next word.
+    [[String]] -> -- ^ Is intended to become a valid 'Concatenations' that are to be appended to the previous word
     -- | The hashing function step. The default value is 20. Is expected to be greater than 2, and better greater than 12.
     Int ->
     String ->
     IO ()
-processingF selFun wrs ks arr gs us vs h numTest hc (grps, mxms) ysss zsss hashStep xs =
-    argsProcessing wrs ks arr gs us vs h ysss zsss xs >>= \( power10
+processingF selFun writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h numTest hc (grps, mxms) ysss zsss hashStep xs =
+    argsProcessing writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h ysss zsss xs >>= \( power10
                                                             , ldc
                                                             , compards
                                                             , html
@@ -550,12 +550,12 @@ processingF selFun wrs ks arr gs us vs h numTest hc (grps, mxms) ysss zsss hashS
             selFun
             (prestr, poststr)
             lineNmb
-            wrs
-            ks
-            arr
-            gs
-            us
-            vs
+            writingSystem
+            allophones
+            arrCharClassification
+            segmentRules
+            basicSpaces
+            additionalDelims
             h
             numTest
             hc
@@ -635,8 +635,7 @@ testsOutput concurrently syllN filtering f ldc numTest universalSet = do
                         `mappend` "  -> "
                         `mappend` showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%"
                         `mappend` ( if rem numTest 10 >= 4
-                                        then -- let min1 = minimumBy (comparing (f ldc [] q qs)) universalSet in
-
+                                        then 
                                             ( "\n"
                                                 `mappend` (if filtering then removeChangesOfDurations else id) min1
                                                 `mappend` "\n"
@@ -653,8 +652,8 @@ testsOutput concurrently syllN filtering f ldc numTest universalSet = do
 
 -- | Internal part of the 'generalF' for processment with a file.
 outputWithFile ::
-    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PRS]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PRS, Double)] into [(PRS, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.1.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
-    ([[[PRS]]] -> [[Word8]]) ->
+    -- | See the conversion function 'Aftovolio.General.Datatype3.zippedDouble2Word8'. It is easier to obtain the function @f::[[[PhoneticPhenomenonRep]]]->[[Double]]@, and, afterwards, you can use 'zippedDouble2Word8' to transform the main semantic kernel of [(PhoneticPhenomenonRep, Double)] into [(PhoneticPhenomenonRep, Word8)]. For more information, see 'https://hackage.haskell.org/package/aftovolio-0.6.2.0/src/README.md' in the section 'Ability to use your own durations of representations of sounds or phonetic phenomena'.
+    ([[[PhoneticPhenomenonRep]]] -> [[Word8]]) ->
     -- | Data used to obtain the phonetic language representation of the text.
     GWritingSystemPRPLX ->
     -- | The pairs of the 'Char' that corresponds to the similar phonetic languages consonant phenomenon (e. g. allophones). Must be sorted in the ascending order to be used correctly.
@@ -662,9 +661,9 @@ outputWithFile ::
     CharPhoneticClassification ->
     SegmentRulesG ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    AdditionalDelimiters ->
     -- | If not null than instead of rhythmicity evaluation using hashes and and feets, there is computed a diversity property for the specified 'String' here using the 'selectSounds' function. For more information, see: 'https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#types'
     String ->
     -- | A value that the different options are compared with. If no command line argument \"+di\" was added, then this is a `C1` applied to the list of positive values normed by 255 (the greatest of which is 255) that the line options are compared with. If null, then the program works without comparison. The length of it must be a least common multiplier of the (number of syllables plus number of \'_digits\' groups) to work correctly. Is not used when the next 'FilePath' and 'String' arguments are not null. If \"+di\" command line argument was  provided, then this corresponds to the case of differentiation.
@@ -676,7 +675,7 @@ outputWithFile ::
     FilePath ->
     Int ->
     IO ()
-outputWithFile h wrs ks arr gs us vs selStr compards sRepresent code grps fs num
+outputWithFile h writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims selStr compards sRepresent code grps fs num
     | mBool && code >= 10 && code <= 19 && grps == 2 =
         putStrLn (mconcat [textP, "\n", breaks, "\n", show rs])
             >> appendF
@@ -694,8 +693,8 @@ outputWithFile h wrs ks arr gs us vs selStr compards sRepresent code grps fs num
     outputS = outputSel lineOption code
     qqs =
         readEq4
-            (mconcat . h . createSyllablesPL wrs ks arr gs us vs)
-            (map (map charS) . mconcat . createSyllablesPL wrs ks arr gs us vs)
+            (mconcat . h . createSyllablesPL writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims)
+            (map (map charS) . mconcat . createSyllablesPL writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims)
             . basicSplit $
             textP
     (breaks, rs) = showZerosFor2PeriodMusic qqs

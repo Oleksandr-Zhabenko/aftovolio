@@ -16,11 +16,12 @@ Stability   :  Experimental
 Maintainer  :  oleksandr.zhabenko@yahoo.com
 
 This module works with syllable segmentation. The generalized version for the module
-'Aftovolio.Ukrainian.Syllable' from @ukrainian-phonetics-basic-array@ package.
+'Aftovolio.Ukrainian.Syllable'.
 -}
 module Aftovolio.General.Syllables (
     -- * Data types and type synonyms
     PRS (..),
+    PhoneticPhenomenonRep,
     PhoneticType (..),
     CharPhoneticClassification,
     StringRepresentation,
@@ -34,6 +35,8 @@ module Aftovolio.General.Syllables (
     SegmentationRules1 (..),
     SegmentRulesG,
     DListRepresentation (..),
+    BasicSpaces,
+    AdditionalDelimiters,
 
     -- * Basic functions
     str2PRSs,
@@ -77,6 +80,7 @@ import Text.Show (Show (..))
 
 -- CAUTION: Please, do not mix with the show7s functions, they are not interoperable.
 
+-- | The AFTOVolio phonetic phenomenon representation. 
 data PRS = SylS
     { charS :: {-# UNPACK #-} !Char
     -- ^ Phonetic languages phenomenon representation. Usually, a phoneme, but it can be otherwise something different.
@@ -86,6 +90,9 @@ data PRS = SylS
     -- respective parts of the code here.
     }
     deriving (Eq, Read)
+
+-- | Type synonym to be used for clarity and better code readability.
+type PhoneticPhenomenonRep = PRS
 
 instance Ord PRS where
     compare (SylS x1 y1) (SylS x2 y2) =
@@ -105,75 +112,75 @@ fromPhoneticType :: PhoneticType -> Int
 fromPhoneticType (P x) = fromEnum x
 
 -- | The 'Array' 'Int' must be sorted in the ascending order to be used in the module correctly.
-type CharPhoneticClassification = Array Int PRS
+type CharPhoneticClassification = Array Int PhoneticPhenomenonRep
 
 {- | The 'String' of converted phonetic language representation 'Char' data is converted to this type to apply syllable
 segmentation or other transformations.
 -}
-type StringRepresentation = [PRS]
+type StringRepresentation = [PhoneticPhenomenonRep]
 
 -- | Is somewhat rewritten from the 'CaseBi.Arr.gBF3' function (not exported) from the @mmsyn2-array@ package.
 gBF4 ::
     (Ix i) =>
-    (# Int#, PRS #) ->
-    (# Int#, PRS #) ->
+    (# Int#, PhoneticPhenomenonRep #) ->
+    (# Int#, PhoneticPhenomenonRep #) ->
     Char ->
-    Array i PRS ->
-    Maybe PRS
-gBF4 (# !i#, k #) (# !j#, m #) c arr
+    Array i PhoneticPhenomenonRep ->
+    Maybe PhoneticPhenomenonRep
+gBF4 (# !i#, k #) (# !j#, m #) c arrayCharClassification
     | isTrue# ((j# -# i#) ># 1#) =
         case compare c (charS p) of
-            GT -> gBF4 (# n#, p #) (# j#, m #) c arr
-            LT -> gBF4 (# i#, k #) (# n#, p #) c arr
+            GT -> gBF4 (# n#, p #) (# j#, m #) c arrayCharClassification
+            LT -> gBF4 (# i#, k #) (# n#, p #) c arrayCharClassification
             _ -> Just p
     | c == charS m = Just m
     | c == charS k = Just k
     | otherwise = Nothing
   where
     !n# = (i# +# j#) `quotInt#` 2#
-    !p = unsafeAt arr (I# n#)
+    !p = unsafeAt arrayCharClassification (I# n#)
 
 findC ::
     Char ->
-    Array Int PRS ->
-    Maybe PRS
-findC c arr = gBF4 (# i#, k #) (# j#, m #) c arr
+    Array Int PhoneticPhenomenonRep ->
+    Maybe PhoneticPhenomenonRep
+findC c arrayCharClassification = gBF4 (# i#, k #) (# j#, m #) c arrayCharClassification
   where
-    !(I# i#, I# j#) = bounds arr
-    !k = unsafeAt arr (I# i#)
-    !m = unsafeAt arr (I# i#)
+    !(I# i#, I# j#) = bounds arrayCharClassification
+    !k = unsafeAt arrayCharClassification (I# i#)
+    !m = unsafeAt arrayCharClassification (I# i#)
 {-# INLINE findC #-}
 
 str2PRSs :: CharPhoneticClassification -> String -> StringRepresentation
-str2PRSs arr = map (\c -> fromJust . findC c $ arr)
+str2PRSs arrayCharClassification = map (\c -> fromJust . findC c $ arrayCharClassification)
 {-# INLINE str2PRSs #-}
 
 {- | Function-predicate 'createsSyllable' checks whether its argument is a phoneme representation that
-every time being presented in the text leads to the creation of the new syllable (in the 'PRS' format).
+every time being presented in the text leads to the creation of the new syllable (in the 'PhoneticPhenomenonRep' format).
 Usually it is a vowel, but in some languages there can be syllabic phonemes that are not considered to be
 vowels.
 -}
-createsSyllable :: PRS -> Bool
+createsSyllable :: PhoneticPhenomenonRep -> Bool
 createsSyllable = (== P 0) . phoneType
 {-# INLINE createsSyllable #-}
 
--- | Function-predicate 'isSonorous1' checks whether its argument is a sonorous consonant representation in the 'PRS' format.
-isSonorous1 :: PRS -> Bool
+-- | Function-predicate 'isSonorous1' checks whether its argument is a sonorous consonant representation in the 'PhoneticPhenomenonRep' format.
+isSonorous1 :: PhoneticPhenomenonRep -> Bool
 isSonorous1 = (`elem` [1, 2]) . fromPhoneticType . phoneType
 {-# INLINE isSonorous1 #-}
 
--- | Function-predicate 'isVoicedC1' checks whether its argument is a voiced consonant representation in the 'PRS' format.
-isVoicedC1 :: PRS -> Bool
+-- | Function-predicate 'isVoicedC1' checks whether its argument is a voiced consonant representation in the 'PhoneticPhenomenonRep' format.
+isVoicedC1 :: PhoneticPhenomenonRep -> Bool
 isVoicedC1 = (`elem` [3, 4]) . fromPhoneticType . phoneType
 {-# INLINE isVoicedC1 #-}
 
--- | Function-predicate 'isVoiceless1' checks whether its argument is a voiceless consonant representation in the 'PRS' format.
-isVoicelessC1 :: PRS -> Bool
+-- | Function-predicate 'isVoiceless1' checks whether its argument is a voiceless consonant representation in the 'PhoneticPhenomenonRep' format.
+isVoicelessC1 :: PhoneticPhenomenonRep -> Bool
 isVoicelessC1 = (`elem` [5, 6]) . fromPhoneticType . phoneType
 {-# INLINE isVoicelessC1 #-}
 
--- | Binary function-predicate 'notCreatesSyllable2' checks whether its arguments are both consonant representations in the 'PRS' format.
-notCreatesSyllable2 :: PRS -> PRS -> Bool
+-- | Binary function-predicate 'notCreatesSyllable2' checks whether its arguments are both consonant representations in the 'PhoneticPhenomenonRep' format.
+notCreatesSyllable2 :: PhoneticPhenomenonRep -> PhoneticPhenomenonRep -> Bool
 notCreatesSyllable2 x y
     | phoneType x == P 0 || phoneType y == P 0 = False
     | otherwise = True
@@ -183,8 +190,8 @@ notCreatesSyllable2 x y
 notEqC ::
     -- | The pairs of the 'Char' that corresponds to the similar phonetic languages consonant phenomenon (e. g. allophones). Must be sorted in the ascending order to be used correctly.
     [(Char, Char)] ->
-    PRS ->
-    PRS ->
+    PhoneticPhenomenonRep ->
+    PhoneticPhenomenonRep ->
     Bool
 notEqC xs x y
     | (== cy) . getBFstLSorted' cx xs $ cx = False
@@ -194,15 +201,15 @@ notEqC xs x y
     !cy = charS y
 {-# INLINE notEqC #-}
 
-{- | Function 'sndGroups' converts a word being a list of 'PRS' to the list of phonetically similar (consonants grouped with consonants and each vowel separately)
-sounds representations in 'PRS' format.
+{- | Function 'sndGroups' converts a word being a list of 'PhoneticPhenomenonRep' to the list of phonetically similar (consonants grouped with consonants and each vowel separately)
+sounds representations in 'PhoneticPhenomenonRep' format.
 -}
-sndGroups :: [PRS] -> [[PRS]]
+sndGroups :: [PhoneticPhenomenonRep] -> [[PhoneticPhenomenonRep]]
 sndGroups ys@(_ : _) = L.groupBy notCreatesSyllable2 ys
 sndGroups _ = []
 {-# INLINE sndGroups #-}
 
-groupSnds :: [PRS] -> [[PRS]]
+groupSnds :: [PhoneticPhenomenonRep] -> [[PhoneticPhenomenonRep]]
 groupSnds = L.groupBy (\x y -> createsSyllable x == createsSyllable y)
 {-# INLINE groupSnds #-}
 
@@ -230,7 +237,7 @@ instance PhoneticElement SegmentationInfo1 where
                     _ -> Nothing
 
 {- | We can think of 'SegmentationPredFunction' in terms of @f ('SI' fN pN) ks [x_{1},x_{2},...,x_{i},...,x_{fN}]@. Comparing with
-'divCnsnts' from the @ukrainian-phonetics-basics-array@ we can postulate that it consists of the following logical terms in
+'divCnsnts' from the 'Aftovolio.Ukrainian.Syllable' we can postulate that it consists of the following logical terms in
 the symbolic form:
 
 1) 'phoneType' x_{i} \`'elem'\` (X{...} = 'map' 'P' ['Int8'])
@@ -244,7 +251,7 @@ phonetic phenomenae (e. g. the double sounds -- the prolonged ones) belong to th
 we can further represent the function by the following data type and operations with it, see 'SegmentationPredFData'.
 -}
 data SegmentationPredFunction
-    = PF (SegmentationInfo1 -> [(Char, Char)] -> [PRS] -> Bool)
+    = PF (SegmentationInfo1 -> [(Char, Char)] -> [PhoneticPhenomenonRep] -> Bool)
 
 data SegmentationPredFData a b
     = L Int [Int] (Array Int a)
@@ -256,34 +263,34 @@ data SegmentationPredFData a b
 class Eval2Bool a where
     eval2Bool :: a -> Bool
 
-type SegmentationFDP = SegmentationPredFData PRS (Char, Char)
+type SegmentationFDP = SegmentationPredFData PhoneticPhenomenonRep (Char, Char)
 
-instance Eval2Bool (SegmentationPredFData PRS (Char, Char)) where
-    eval2Bool (L i js arr)
+instance Eval2Bool (SegmentationPredFData PhoneticPhenomenonRep (Char, Char)) where
+    eval2Bool (L i js arrayCharClassification)
         | all (<= n) js && i <= n && i >= 1 && all (>= 1) js =
-            fromPhoneticType (phoneType (unsafeAt arr $ i - 1)) `elem` js
+            fromPhoneticType (phoneType (unsafeAt arrayCharClassification $ i - 1)) `elem` js
         | otherwise =
             error
                 "Aftovolio.General.Syllables.eval2Bool: 'L' element is not properly defined. "
       where
-        n = numElements arr
-    eval2Bool (NEC i j arr ks)
+        n = numElements arrayCharClassification
+    eval2Bool (NEC i j arrayCharClassification allophones)
         | i >= 1 && j >= 1 && i /= j && i <= n && j <= n =
-            notEqC ks (unsafeAt arr $ i - 1) (unsafeAt arr $ j - 1)
+            notEqC allophones (unsafeAt arrayCharClassification $ i - 1) (unsafeAt arrayCharClassification $ j - 1)
         | otherwise =
             error
                 "Aftovolio.General.Syllables.eval2Bool: 'NEC' element is not properly defined. "
       where
-        n = numElements arr
+        n = numElements arrayCharClassification
     eval2Bool (C x y) = eval2Bool x && eval2Bool y
     eval2Bool (D x y) = eval2Bool x || eval2Bool y
 
-type DListFunctionResult = ([PRS] -> [PRS], [PRS] -> [PRS])
+type DListFunctionResult = ([PhoneticPhenomenonRep] -> [PhoneticPhenomenonRep], [PhoneticPhenomenonRep] -> [PhoneticPhenomenonRep])
 
 class DListRepresentation a b where
     toDLR :: b -> [a] -> ([a] -> [a], [a] -> [a])
 
-instance DListRepresentation PRS Int8 where
+instance DListRepresentation PhoneticPhenomenonRep Int8 where
     toDLR left xs
         | null xs = (id, id)
         | null ts = (id, (zs `mappend`))
@@ -310,7 +317,7 @@ data SegmentationRules1 = SR1
     deriving (Read, Show)
 
 {- | List of the 'SegmentationRules1' sorted in the descending order by the 'fieldN' 'SegmentationInfo1' data and where the
-length of all the 'SegmentationPredFunction' lists of 'PRS' are equal to the 'fieldN' 'SegmentationInfo1' data by definition.
+length of all the 'SegmentationPredFunction' lists of 'PhoneticPhenomenonRep' are equal to the 'fieldN' 'SegmentationInfo1' data by definition.
 -}
 type SegmentRulesG = [SegmentationRules1]
 
@@ -318,17 +325,17 @@ type SegmentRulesG = [SegmentationRules1]
 different neighbour syllables if the group is between two vowels in a word. The group must be not empty, but this is not checked.
 The example phonetical information for the proper performance in Ukrainian can be found from the:
 https://msn.khnu.km.ua/pluginfile.php/302375/mod_resource/content/1/%D0%9B.3.%D0%86%D0%86.%20%D0%A1%D0%BA%D0%BB%D0%B0%D0%B4.%D0%9D%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D1%81.pdf
-The example of the 'divCnsnts' can be found at: https://hackage.haskell.org/package/ukrainian-phonetics-basic-array-0.1.2.0/docs/src/Languages.Phonetic.Ukrainian.Syllable.Arr.html#divCnsnts
+The example of the 'divCnsnts' can be found at: https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/Aftovolio-Ukrainian-Syllable.html#v:divCnsnts
 -}
 divCnsnts ::
     -- | The pairs of the 'Char' that corresponds to the similar phonetic languages consonant phenomenon (e. g. allophones). Must be sorted in the ascending order to be used correctly.
     [(Char, Char)] ->
     SegmentRulesG ->
-    [PRS] ->
+    [PhoneticPhenomenonRep] ->
     DListFunctionResult
-divCnsnts ks gs xs@(_ : _) = toDLR left xs
+divCnsnts allophones segmentRules xs@(_ : _) = toDLR left xs
   where
-    !js = fromJust . L.find ((== length xs) . fromEnum . fieldN . infoS) $ gs -- js :: SegmentationRules1
+    !js = fromJust . L.find ((== length xs) . fromEnum . fieldN . infoS) $ segmentRules -- js :: SegmentationRules1
     !left = resF . fromJust . L.find (eval2Bool . predF) . lineFs $ js
 divCnsnts _ _ [] = (id, id)
 
@@ -336,17 +343,17 @@ reSyllableCntnts ::
     -- | The pairs of the 'Char' that corresponds to the similar phonetic languages consonant phenomenon (e. g. allophones). Must be sorted in the ascending order to be used correctly.
     [(Char, Char)] ->
     SegmentRulesG ->
-    [[PRS]] ->
-    [[PRS]]
-reSyllableCntnts ks gs (xs : ys : zs : xss)
+    [[PhoneticPhenomenonRep]] ->
+    [[PhoneticPhenomenonRep]]
+reSyllableCntnts allophones segmentRules (xs : ys : zs : xss)
     | (/= P 0) . phoneType . last $ ys =
-        fst (divCnsnts ks gs ys) xs
-            : reSyllableCntnts ks gs (snd (divCnsnts ks gs ys) zs : xss)
-    | otherwise = reSyllableCntnts ks gs ((xs `mappend` ys) : zs : xss)
+        fst (divCnsnts allophones segmentRules ys) xs
+            : reSyllableCntnts allophones segmentRules (snd (divCnsnts allophones segmentRules ys) zs : xss)
+    | otherwise = reSyllableCntnts allophones segmentRules ((xs `mappend` ys) : zs : xss)
 reSyllableCntnts _ _ (xs : ys : _) = [(xs `mappend` ys)]
 reSyllableCntnts _ _ xss = xss
 
-divSylls :: [[PRS]] -> [[PRS]]
+divSylls :: [[PhoneticPhenomenonRep]] -> [[PhoneticPhenomenonRep]]
 divSylls = mapI (\ws -> (length . filter createsSyllable $ ws) > 1) h3
   where
     h3 us =
@@ -354,6 +361,12 @@ divSylls = mapI (\ws -> (length . filter createsSyllable $ ws) > 1) h3
             `mappend` (L.groupBy (\x y -> createsSyllable x && phoneType y /= P 0) . drop 1 $ zs)
       where
         (ys, zs) = break createsSyllable us
+
+-- | Basic group of delimiters in the 'String' that are not converted to the phonemes or not silent sounds. Silent sounds or their absense, e. g. word gaps.
+type BasicSpaces = String
+
+-- | Is used for additional delimiters that are not included in the 'BasicSpaces' group for some reason.
+type AdditionalDelimiters = String
 
 {- | The function actually creates syllables using the provided data. Each resulting inner-most list is a phonetic language representation
 of the syllable according to the rules provided.
@@ -366,27 +379,27 @@ createSyllablesPL ::
     CharPhoneticClassification ->
     SegmentRulesG ->
     -- | Corresponds to the 100 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    BasicSpaces ->
     -- | Corresponds to the 101 delimiter in the @ukrainian-phonetics-basic-array@ package.
-    String ->
+    AdditionalDelimiters ->
     -- | Actually the converted 'String'.
     String ->
-    [[[PRS]]]
-createSyllablesPL wrs ks arr gs us vs =
-    map (divSylls . reSyllableCntnts ks gs . groupSnds . str2PRSs arr)
+    [[[PhoneticPhenomenonRep]]]
+createSyllablesPL writingSystem allophones arrayCharClassification segmentRules basicSpaces additionalDelims =
+    map (divSylls . reSyllableCntnts allophones segmentRules . groupSnds . str2PRSs arrayCharClassification)
         . words1
         . mapMaybe g
         . convertToProperPL
         . map (\x -> if x == '-' then ' ' else x)
   where
     g x
-        | x `elem` us = Nothing
-        | x `notElem` vs = Just x
+        | x `elem` basicSpaces = Nothing
+        | x `notElem` additionalDelims = Just x
         | otherwise = Just ' '
     words1 xs = if null ts then [] else w : words1 s'' -- Practically this is an optimized version for this case 'words' function from Prelude.
       where
         ts = dropWhile (== ' ') xs
         (w, s'') = break (== ' ') ts
     {-# NOINLINE words1 #-}
-    convertToProperPL = concatMap string1 . stringToXG wrs
+    convertToProperPL = concatMap string1 . stringToXG writingSystem
 {-# INLINE createSyllablesPL #-}

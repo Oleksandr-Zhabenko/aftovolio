@@ -48,3 +48,7 @@
 
 * Sixth version revised A. Fixed some issues with the documentation.
 
+## 0.6.2.0 -- 2024-11-30
+
+* Sixth version revised B. Improved documentation and code readability for several modules.
+

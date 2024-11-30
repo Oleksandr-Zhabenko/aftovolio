@@ -113,9 +113,9 @@ We conclude that for the whole set of expediently organized texts the existence 
 
 ## Ability to use your own durations of representations of sounds or phonetic phenomena
 
-The programs offer four different sets of phonetic representations by default but it is possible to set your own durations. To do this, specify them as numbers of type 'Word8' (that can be obtained from the 'Double' values from the convex hull envelope method above or from some analogous procedure by the function [zippedDouble2Word8](https://hackage.haskell.org/package/aftovolio-0.6.1.0/docs/src/Aftovolio.General.Datatype3.html#zippedDouble2Word8), see documentation for the [module](https://hackage.haskell.org/package/aftovolio-0.6.1.0/docs/src/Aftovolio.General.Datatype3.html)) in the file in the order defined as follows:
+The programs offer four different sets of phonetic representations by default but it is possible to set your own durations. To do this, specify them as numbers of type 'Word8' (that can be obtained from the 'Double' values from the convex hull envelope method above or from some analogous procedure by the function [zippedDouble2Word8](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.General.Datatype3.html#zippedDouble2Word8), see documentation for the [module](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.General.Datatype3.html)) in the file in the order defined as follows:
 
-where the specified values in the list refer to the [phonetic representations](https://hackage.haskell.org/package/aftovolio-0.6.1.0/docs/src/Aftovolio.Ukrainian.Syllable.html#showS8) from the module Aftovolio.Ukrainian.Syllable. The last column is 8-bit integers (GHC.Int.Int8), which represent these sounds in the new modules.
+where the specified values in the list refer to the [phonetic representations](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.Ukrainian.Syllable.html#showS8) from the module Aftovolio.Ukrainian.Syllable. The last column is 8-bit integers (GHC.Int.Int8), which represent these sounds in the new modules.
 
 If you want to specify several such sets (up to 9 inclusive), you can specify '\*' or several such characters from a new line, and then from the next line there will be a new set of values.
 
@@ -323,27 +323,43 @@ Let's try to use the property y0 with a selective sum to analyze the original ve
 
 Let's pay attention to the second line - \"Хрущі над вишнями гудуть.\" In it, the words \"хрущі\" and \"гудуть\" with \"у\" are placed as far as possible from each other. This suggests that this line satisfies the property y0.y. We check:
 
+$$
+\begin{verbatim}
   aftovolioUkr +ul y0.у Хрущі над вишнями гудуть
   7 Хрущі гудуть надвишнями  3    7 надвишнями Хрущі гудуть  4
   6 надвишнями гудуть Хрущі  2    18 гудуть надвишнями Хрущі  5
   6 гудуть Хрущі надвишнями  1    19 Хрущі надвишнями гудуть  6
-  
+\end{verbatim}  
+$$
+
 Indeed, 19 out of a maximum possible 19! But it can be noticed that the vowels in the words are selected so that they do not repeat closely, so the maximum can be expected not only for y0.y, but also for the more general property y0.vw:
 
+$$
+\begin{verbatim}
   aftovolioUkr +ul y0.vw Хрущі над вишнями гудуть
   7 Хрущі гудуть надвишнями  3    7 надвишнями Хрущі гудуть  4
   6 надвишнями гудуть Хрущі  2    18 гудуть надвишнями Хрущі  5
   6 гудуть Хрущі надвишнями  1    19 Хрущі надвишнями гудуть  6
-  
+\end{verbatim}  
+$$
+
 Again the maximum 19 out of 19 possible! Okay, that's it for this line. And for the whole poem? If we check every line with 
 
+$$
+\begin{verbatim}
   aftovolioUkr +ul y0.vw
+\end{verbatim}  
+$$
 
 command, then we see many maximums. 
 
 We check: indeed, many maximums! But not all\.\.\. Let's try to add something or take something away to increase the number of maxima, then this new property will be the most appropriate. Let's see where there are no maxima and why. For example, lines in a row --- \"А матері вечерять ждуть. // Сем'я вечеря коло хати // \" --- in them we notice that the sounds \"е\" are close to each other. Then if you take away the \"е\", maybe it will be closer to the maximum? We check:
 
+$$
+\begin{verbatim}
   aftovolioUkr +ul y0.а.о.у.и.і
+\end{verbatim}  
+$$
 
 We pay attention, indeed, for these lines there was a shift towards maximums, the last line \"Та соловейко не затих\" also \"risen\" to the maximum (admittedly, from two possible options). Instead, the line \"Дочка вечерять подає\" \"dropped\" from the maximum to the 3 interval. It can be assumed that the \"status\" of \"е\" in the poem is \"unclear\": with or without it.
 
@@ -369,10 +385,14 @@ Therefore, for the Ukrainian language it is appropriate to use =13 or similar va
 
 See, for example:
 
+$$
+\begin{verbatim}
   aftovolioUkr -e +r 21 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
-  \...
+  \.\.\.
   8 садок вишневий колохати надвишнями гудуть хрущі  711
-  
+\end{verbatim}  
+$$
+ 
 as the element with the maximum value (the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
 
 You can easily paste the =133 group into the text in many editors or on the command line directly.
@@ -445,11 +465,10 @@ The second argument greater or equal to 10 takes effect only if the meter consis
 
 - +r   — afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: "543" means that the line is split into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7\.\.\.2. The values less than the lowest minimum are neglected.
 
-- +c   — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.3.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that theee corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
+- +c   — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.8.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that theee corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
 
 - -t   — and afterwards the number in the range [0..179]  (with some exceptions) showing the test for 'smoothness' (to be more accurate - absence or presence of some irregularities that influences the prosody) to be run - you can see a list of possible values for the parameter here at the link:
-[link1](https://hackage.haskell.org/package/phladiprelio-ukrainian-simple-0.6.0.0/src/app/Main.hs) on the lines number: 51; 56-115; 118-126. The first section of the lines numbers 56-63 and 120 corresponds to the detailed explanation below.
-For ideas of actual usage of the tests, see the documentation above.
+[link1](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.Tests.html#sel). For ideas of actual usage of the tests, see the documentation above.
 
 - -C   — If specified with +RTS -N -RTS rtsoptions for the multicore computers with -t option then it can speed up the full computation of the all tests using more resources. Uses asynchcronous concurrent threads in computation. This groups (-C and rtsoptions) can be specified in any position as command line groups of arguments. The output is in this case not sorted in the order of 2,3,4,5,6,7, but can vary depending on your CPU configurations and states and / or some other factors.
 

@@ -100,7 +100,7 @@ generalF ::
 generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lineNmb file numTest hc (grps, mxms) k hashStep emptyline splitting (fs, code) concurrently initstr universalSet@(_ : _ : _) = do
     syllableDurationsDs <- readSyllableDurations file
     let syllN = countSyll initstr
-        f ldc compards syllableDurationsDs grps mxms -- Since the version 0.12.0.0, has a possibility to evaluate diversity property.
+        f ldc compards syllableDurationsDs grps mxms 
             | L.null selStr =
                 ( if doubleFunc (L.null :: [Word8] -> Bool) (L.null :: [Int8] -> Bool) compards
                     then (sum . R.countHashes2G hashStep hc grps mxms)
