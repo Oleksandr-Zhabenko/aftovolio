@@ -324,31 +324,25 @@ Let's try to use the property y0 with a selective sum to analyze the original ve
 Let's pay attention to the second line - \"Хрущі над вишнями гудуть.\" In it, the words \"хрущі\" and \"гудуть\" with \"у\" are placed as far as possible from each other. This suggests that this line satisfies the property y0.y. We check:
 
 $$
-\begin{verbatim}
   aftovolioUkr +ul y0.у Хрущі над вишнями гудуть
   7 Хрущі гудуть надвишнями  3    7 надвишнями Хрущі гудуть  4
   6 надвишнями гудуть Хрущі  2    18 гудуть надвишнями Хрущі  5
   6 гудуть Хрущі надвишнями  1    19 Хрущі надвишнями гудуть  6
-\end{verbatim}  
 $$
 
 Indeed, 19 out of a maximum possible 19! But it can be noticed that the vowels in the words are selected so that they do not repeat closely, so the maximum can be expected not only for y0.y, but also for the more general property y0.vw:
 
 $$
-\begin{verbatim}
   aftovolioUkr +ul y0.vw Хрущі над вишнями гудуть
   7 Хрущі гудуть надвишнями  3    7 надвишнями Хрущі гудуть  4
   6 надвишнями гудуть Хрущі  2    18 гудуть надвишнями Хрущі  5
   6 гудуть Хрущі надвишнями  1    19 Хрущі надвишнями гудуть  6
-\end{verbatim}  
 $$
 
 Again the maximum 19 out of 19 possible! Okay, that's it for this line. And for the whole poem? If we check every line with 
 
 $$
-\begin{verbatim}
   aftovolioUkr +ul y0.vw
-\end{verbatim}  
 $$
 
 command, then we see many maximums. 
@@ -356,9 +350,7 @@ command, then we see many maximums.
 We check: indeed, many maximums! But not all\.\.\. Let's try to add something or take something away to increase the number of maxima, then this new property will be the most appropriate. Let's see where there are no maxima and why. For example, lines in a row --- \"А матері вечерять ждуть. // Сем'я вечеря коло хати // \" --- in them we notice that the sounds \"е\" are close to each other. Then if you take away the \"е\", maybe it will be closer to the maximum? We check:
 
 $$
-\begin{verbatim}
   aftovolioUkr +ul y0.а.о.у.и.і
-\end{verbatim}  
 $$
 
 We pay attention, indeed, for these lines there was a shift towards maximums, the last line \"Та соловейко не затих\" also \"risen\" to the maximum (admittedly, from two possible options). Instead, the line \"Дочка вечерять подає\" \"dropped\" from the maximum to the 3 interval. It can be assumed that the \"status\" of \"е\" in the poem is \"unclear\": with or without it.
@@ -386,11 +378,9 @@ Therefore, for the Ukrainian language it is appropriate to use =13 or similar va
 See, for example:
 
 $$
-\begin{verbatim}
   aftovolioUkr -e +r 21 садок=133 вишне=133вий ко=133лоха=133ти хрущі=133 над ви=133шнями гудуть=133
   \.\.\.
   8 садок вишневий колохати надвишнями гудуть хрущі  711
-\end{verbatim}  
 $$
  
 as the element with the maximum value (the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
