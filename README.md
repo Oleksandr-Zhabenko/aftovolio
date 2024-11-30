@@ -456,6 +456,8 @@ The second argument greater or equal to 10 takes effect only if the meter consis
 
 - +x   — If specified with the further natural number then means that instead of maximum 7 words or their concatenations that can be analysed together as a line there will be taken the specified number here or 9 if the number is greater than 8. More words leads to more computations, therefore, please, use with this caution in mind. It can be useful mostly for the cases with the additional constraints specified (+a \.\.\. -a or +b \.\.\. -b groups, see above).
 
+- -cm   — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. The total number of sources is limited to no more than 14.
+
 - +m   — If present followed with two arguments — the name of the file to be used for reading data for multiline processment and the second one — the number of line to be processed. The numeration of the lines in the file for the aftovolioUkr program here starts from 1 (so, it is: 1, 2, 3, 4,.. etc). The program then uses instead of text the specified line from the file specified here and prints information about its previous and next lines (if available).
 
 - +m2   — If present, it means that the line with the corresponding number specified here will be taken from the same file specified as +m \<file\>. For example, the entry +m \<file\> 1 +m2 4 means that 1 line will be taken from the file \<file\> for the similarity analysis and it will be compared not with contents of +l2 \.\.\. -l2, but with the 4th line from the same file.
@@ -463,6 +465,8 @@ The second argument greater or equal to 10 takes effect only if the meter consis
 The abbreviation for +m \<file\> \<num1\> +m2 \<num2\> is +m3 \<file\> \<num1\> \<num2\>, which has the same meaning but a slightly shorter entry.
 
 If \<num1\> == \<num2>, then there is at least one of all the options with a property value of 0.
+
+# "Music" mode of operation and extended possibilities
 
 You can also use the "music" mode, which allows you to write better lyrics and music. To do this, you can add a record of the form \_{set of digits} or ={set of digits} to a word or between syllables after the needed to be referred to, and this set of digits will be converted to a non-negative Double number by the program and then used to modulate the duration of the previous syllable or of the additional one(s) added here. The first digit in the record after '=' or '\_' is a whole number and the rest is a fraction (mantissa).
 
@@ -477,6 +481,4 @@ When the results of the program are displayed on the screen, these inserts will 
 If you specify \_1, \_10, \_100, \_1000, etc. as such an insertion, the program will assume that this insertion duration is equal to the duration of the syllable to which it refers. If the set of digits is preceded by a 0, the insertion has a shorter duration, if the 1 in the first 4 examples above is followed by digits other than 0, or if another digit is used instead of 1 or 0, the insertion has a longer duration. For example, \_05 means exactly half the duration of the syllable, and \_2 means double the duration. In any case the resulting values cannot be greater than 255, the greater ones are rounded to 255.
 
 For the "music" mode the number of syllables printed for the line does include the inserts.
-
-- -cm   — If present, the program works in a special comparative mode reading information from the several files line-by-line and prompting to choose the resulting option from the files given. If some files do not have such lines, then the resulting option for the file is empty. You choose the resulting option by typing its number on the terminal. The total number of sources is limited to no more than 14.
 
