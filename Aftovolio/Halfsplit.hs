@@ -19,6 +19,8 @@ import GHC.Int (Int8)
 import GHC.Num (abs, (+), (-))
 import GHC.Real (quot, quotRem)
 import System.IO (getLine, putStr, putStrLn)
+import Text.Read (readMaybe)
+import Data.Maybe (Maybe,fromMaybe)
 import Text.Show (Show (..))
 import Debug.Trace
 
@@ -154,3 +156,14 @@ print23 filtering prestr poststr n xss = do
   where
     l = length xss
     putSLn = putStrLn . (if filtering then removeChangesOfDurations else id)
+
+readNums :: [String] -> [Int]
+readNums = concatMap readNs
+  where readNs :: String -> [Int]
+        readNs xs 
+            | any (== '-') xs = 
+                 let (ys, ts) = break (== '-') xs 
+                     us = dropWhile (not . isDigit) ts
+                 in [(fromMaybe 1 (readMaybe ys:: Maybe Int))..(fromMaybe 1 (readMaybe us:: Maybe Int))]
+            | otherwise = [fromMaybe 1 (readMaybe xs:: Maybe Int)]
+{-# INLINE readNums #-}

@@ -52,3 +52,7 @@
 
 * Sixth version revised B. Improved documentation and code readability for several modules.
 
+## 0.7.0.0 -- 2025-02-15
+
+* Seventh version. Added new command line argument group +nm ... -nm and changed the arity of the main functions. These arguments are the line numbers of the sorted Aftovolio data to be displayed in the modes except tests and file appending.
+

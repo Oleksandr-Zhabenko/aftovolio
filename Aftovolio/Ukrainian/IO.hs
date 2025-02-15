@@ -95,9 +95,11 @@ generalF ::
     Bool ->
     -- | An initial string to be analysed.
     String ->
+    -- | A list of line numbers of the Aftovolio data to be displayed in the modes except tests and file appending.
+    [Int] -> 
     [String] ->
     IO [String]
-generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lineNmb file numTest hc (grps, mxms) k hashStep emptyline splitting (fs, code) concurrently initstr universalSet@(_ : _ : _) = do
+generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lineNmb file numTest hc (grps, mxms) k hashStep emptyline splitting (fs, code) concurrently initstr lineNumbersSel universalSet@(_ : _ : _) = do
     syllableDurationsDs <- readSyllableDurations file
     let syllN = countSyll initstr
         f ldc compards syllableDurationsDs grps mxms 
@@ -151,78 +153,87 @@ generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lin
                 numTest
                 universalSet
         else
-            let sRepresent =
+            let lgth = length universalSet
+                sRepresent =
                     zipWith (\k (x, ys) -> S k x ys) [1 ..]
                         . sortOn id
                         . map (\xss -> (f ldc compards syllableDurationsDs grps mxms xss, xss))
                         $ universalSet
-                strOutput =
+                strOutput 
+                    | L.null lineNumbersSel =
                     force
-                        . (: [])
+                        . lines
                         . halfsplit1G
                             (\(S _ y _) -> y)
                             filtering
                             (if html then "<br>" else "")
                             (jjj splitting) $
                         sRepresent
+                    | otherwise = 
+                    force 
+                        . filter (not . L.null)
+                        . map (\ (S k _ qqs) -> if (k `elem` lineNumbersSel && k <= lgth) then qqs else [])
+                        $ sRepresent
              in do
-                    let lns1 = unlines strOutput
-                    putStrLn lns1
-                    if L.null dcfile
-                        then putStr ""
-                        else do
-                            exist <- doesFileExist dcfile
-                            if exist
-                                then do
-                                    perms <- getPermissions dcfile
-                                    if writable perms
-                                        then writeFile dcfile lns1
-                                        else
-                                            error $
-                                                "Aftovolio.Ukrainian.IO.generalF: File "
-                                                    `mappend` dcfile
-                                                    `mappend` " is not writable!"
-                                else do
-                                    currdir <- getCurrentDirectory
-                                    perms <- getPermissions currdir
-                                    if writable perms
-                                        then writeFile dcfile lns1
-                                        else
-                                            error $
-                                                "Aftovolio.Ukrainian.IO.generalF: Directory of the file "
-                                                    `mappend` dcfile
-                                                    `mappend` " is not writable!"
-                    let l1 = length sRepresent
-                    if code == -1
-                        then
-                            if lineNmb == -1
-                                then return strOutput
-                                else do
-                                    print23 filtering prestr poststr 1 [initstr]
-                                    return strOutput
-                        else do
-                            print23 filtering prestr poststr 1 [initstr]
-                            parseLineNumber l1 >>= \num -> do
-                                permiss <- getPermissions fs
-                                let writ = writable permiss
-                                    readab = readable permiss
-                                if writ && readab
-                                    then
-                                        outputWithFile
-                                            selStr
-                                            compards
-                                            sRepresent
-                                            file
-                                            syllableDurationsDs
-                                            code
-                                            grps
-                                            k
-                                            fs
-                                            num
-                                    else
-                                        error
-                                            "Aftovolio.Ukrainian.IO.generalF: The specified file cannot be used for appending the text! Please, specify another file!"
-                                return []
+                    if L.null lineNumbersSel then do
+                         let lns1 = unlines strOutput
+                         putStrLn lns1
+                         if L.null dcfile
+                             then putStr ""
+                             else do
+                                 exist <- doesFileExist dcfile
+                                 if exist
+                                     then do
+                                         perms <- getPermissions dcfile
+                                         if writable perms
+                                             then writeFile dcfile lns1
+                                             else
+                                                 error $
+                                                     "Aftovolio.Ukrainian.IO.generalF: File "
+                                                         `mappend` dcfile
+                                                         `mappend` " is not writable!"
+                                     else do
+                                         currdir <- getCurrentDirectory
+                                         perms <- getPermissions currdir
+                                         if writable perms
+                                             then writeFile dcfile lns1
+                                             else
+                                                 error $
+                                                     "Aftovolio.Ukrainian.IO.generalF: Directory of the file "
+                                                         `mappend` dcfile
+                                                         `mappend` " is not writable!"
+                         let l1 = length sRepresent
+                         if code == -1
+                             then
+                                 if lineNmb == -1
+                                     then return strOutput
+                                     else do
+                                         print23 filtering prestr poststr 1 [initstr]
+                                         return strOutput
+                             else do
+                                 print23 filtering prestr poststr 1 [initstr]
+                                 parseLineNumber l1 >>= \num -> do
+                                     permiss <- getPermissions fs
+                                     let writ = writable permiss
+                                         readab = readable permiss
+                                     if writ && readab
+                                         then
+                                             outputWithFile
+                                                 selStr
+                                                 compards
+                                                 sRepresent
+                                                 file
+                                                 syllableDurationsDs
+                                                 code
+                                                 grps
+                                                 k
+                                                 fs
+                                                 num
+                                         else
+                                             error
+                                                 "Aftovolio.Ukrainian.IO.generalF: The specified file cannot be used for appending the text! Please, specify another file!"
+                                     return strOutput
+                    else mapM_ putStrLn strOutput >> return strOutput              
   where
     jjj kk = let (q1, r1) = quotRem kk (if kk < 0 then -10 else 10) in jjj' q1 r1 emptyline
     jjj' q1 r1 emptyline
@@ -230,10 +241,10 @@ generalF power10 ldc compards html filtering dcfile selStr (prestr, poststr) lin
         | r1 == 1 || r1 == 3 = 10 * q1 + (if emptyline then 5 else r1)
         | r1 < 0 = -10 * q1 + (if emptyline then -4 else r1)
         | otherwise = 10 * q1 + (if emptyline then 4 else r1)
-generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ [u1] = do
+generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ [u1] = do
     putStrLn u1
     return [u1]
-generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ =
+generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ =
     let strOutput =
             [ "You have specified the data and constraints on it that lead to no further possible options."
             , "Please, specify another data and constraints."
@@ -242,7 +253,7 @@ generalF _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ =
             putStrLn . unlines $ strOutput
             return strOutput
 
-data AftovolioUkr = S Int Integer String deriving (Eq, Generic)
+data AftovolioUkr = S !Int !Integer !String deriving (Eq, Generic)
 
 instance NFData AftovolioUkr
 

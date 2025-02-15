@@ -28,7 +28,7 @@ import Control.DeepSeq
 import Data.Char (isDigit, isSpace)
 import Data.ChooseLine2
 import Data.List hiding (foldr, null)
-import qualified Data.List as L (null)
+import qualified Data.List as L (null,lines)
 import Data.Maybe (catMaybes, fromJust, fromMaybe, isNothing, mapMaybe)
 import Data.MinMax1 (minMax11By)
 import Data.Ord (Down (..), comparing)
@@ -113,9 +113,11 @@ generalF ::
     Bool ->
     -- | An initial string to be analyzed.
     String ->
+    -- | A list of line numbers of the Aftovolio data to be displayed in the modes except tests and file appending.
+    [Int] -> 
     [String] ->
     IO [String]
-generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, poststr) lineNmb writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h numTest hc (grps, mxms) hashStep emptyline splitting (fs, code) concurrently initstr universalSet
+generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, poststr) lineNmb writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h numTest hc (grps, mxms) hashStep emptyline splitting (fs, code) concurrently initstr lineNumbersSel universalSet
     | L.null universalSet = do
         let strOutput =
                 [ "You have specified the data and constraints on it that lead to no further possible options."
@@ -158,67 +160,76 @@ generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, posts
             && doubleFunc (L.null :: [Word8] -> Bool) (L.null :: [Int8] -> Bool) compards
             then testsOutput concurrently syllN filtering f ldc numTest universalSet
             else
-                let sRepresent =
+                let lgth = length universalSet
+                    sRepresent =
                         zipWith (\k (x, ys) -> S k x ys) [1 ..]
                             . sortOn id
                             . map (\xss -> (f ldc compards grps mxms xss, xss))
                             $ universalSet
-                    strOutput =
+                    strOutput 
+                        | L.null lineNumbersSel =
                         force
-                            . (: [])
+                            . L.lines
                             . halfsplit1G
                                 (\(S _ y _) -> y)
                                 filtering
                                 (if html then "<br>" else "")
                                 (jjj splitting) $
                             sRepresent
+                        | otherwise = 
+                         force 
+                             . filter (not . L.null)
+                             . map (\ (S k _ qqs) -> if (k `elem` lineNumbersSel && k <= lgth) then qqs else [])
+                             $ sRepresent
                     lns1 = unlines strOutput
                  in do
-                        putStrLn lns1
-                        if L.null dcfile
-                            then putStr ""
-                            else do
-                                doesFileExist dcfile >>= \exist ->
-                                    if exist
-                                        then do
-                                            getPermissions dcfile >>= \perms ->
-                                                if writable perms
-                                                    then writeFile dcfile lns1
-                                                    else
-                                                        error $
-                                                            "Aftovolio.General.IO.generalF: File "
-                                                                `mappend` dcfile
-                                                                `mappend` " is not writable!"
-                                        else do
-                                            getCurrentDirectory >>= \currdir -> do
-                                                getPermissions currdir >>= \perms ->
-                                                    if writable perms
-                                                        then writeFile dcfile lns1
-                                                        else
-                                                            error $
-                                                                "Aftovolio.General.IO.generalF: Directory of the file "
-                                                                    `mappend` dcfile
-                                                                    `mappend` " is not writable!"
-                        let l1 = length sRepresent
-                        if code == -1
-                            then
-                                if lineNmb == -1
-                                    then return strOutput
-                                    else do
-                                        print23 filtering prestr poststr 1 [initstr]
-                                        return strOutput
-                            else do
-                                print23 filtering prestr poststr 1 [initstr]
-                                parseLineNumber l1 >>= \num -> do
-                                    permiss <- getPermissions fs
-                                    let writ = writable permiss
-                                        readab = readable permiss
-                                    if writ && readab
-                                        then outputWithFile h writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims selStr compards sRepresent code grps fs num
-                                        else
-                                            error
-                                                "The specified file cannot be used for appending the text! Please, specify another file!"
-                                    return []
+                        if L.null lineNumbersSel then do
+                             putStrLn lns1
+                             if L.null dcfile
+                                 then putStr ""
+                                 else do
+                                     doesFileExist dcfile >>= \exist ->
+                                         if exist
+                                             then do
+                                                 getPermissions dcfile >>= \perms ->
+                                                     if writable perms
+                                                         then writeFile dcfile lns1
+                                                         else
+                                                             error $
+                                                                 "Aftovolio.General.IO.generalF: File "
+                                                                     `mappend` dcfile
+                                                                     `mappend` " is not writable!"
+                                             else do
+                                                 getCurrentDirectory >>= \currdir -> do
+                                                     getPermissions currdir >>= \perms ->
+                                                         if writable perms
+                                                             then writeFile dcfile lns1
+                                                             else
+                                                                 error $
+                                                                     "Aftovolio.General.IO.generalF: Directory of the file "
+                                                                         `mappend` dcfile
+                                                                         `mappend` " is not writable!"
+                             let l1 = length sRepresent
+                             if code == -1
+                                 then
+                                     if lineNmb == -1
+                                         then return strOutput
+                                         else do
+                                             print23 filtering prestr poststr 1 [initstr]
+                                             return strOutput
+                                 else do
+                                     print23 filtering prestr poststr 1 [initstr]
+                                     parseLineNumber l1 >>= \num -> do
+                                         permiss <- getPermissions fs
+                                         let writ = writable permiss
+                                             readab = readable permiss
+                                         if writ && readab
+                                             then outputWithFile h writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims selStr compards sRepresent code grps fs num
+                                             else
+                                                 error
+                                                     "The specified file cannot be used for appending the text! Please, specify another file!"
+                                         return strOutput
+                        else mapM putStrLn strOutput >> return strOutput          
   where
     jjj kk = let (q1, r1) = quotRem kk (if kk < 0 then -10 else 10) in jjj' q1 r1 emptyline
     jjj' q1 r1 emptyline
@@ -227,7 +238,7 @@ generalF power10 ldc compards html filtering dcfile selStr selFun (prestr, posts
         | r1 < 0 = -10 * q1 + (if emptyline then -4 else r1)
         | otherwise = 10 * q1 + (if emptyline then 4 else r1)
 
-data AftovolioGen = S Int Integer String deriving (Eq, Generic)
+data AftovolioGen = S !Int !Integer !String deriving (Eq, Generic)
 
 instance Show AftovolioGen where
     show (S i j xs) =
@@ -342,6 +353,7 @@ argsProcessing ::
         , Int
         , Bool
         , String
+        , [Int]
         , [String]
         )
 argsProcessing writingSystem allophones arrCharClassification segmentRules basicSpaces additionalDelims h ysss zsss xs = do
@@ -352,7 +364,7 @@ argsProcessing writingSystem allophones arrCharClassification segmentRules basic
     if not . L.null $ compareByLinesFinalFile
         then do
             compareFilesToOneCommon 14 args11 compareByLinesFinalFile
-            return (0, 0, (C1 []), False, False, [], [], [], [], 0, False, 0, [], 0, False, [], [])
+            return (0, 0, (C1 []), False, False, [], [], [], [], 0, False, 0, [], 0, False, [], [], [])
         else do
             let prepare = any (== "-p") args11
                 emptyline = any (== "+l") args11
@@ -447,6 +459,7 @@ argsProcessing writingSystem allophones arrCharClassification segmentRules basic
                               ) $
                             arg3s
                 l = length ll
+                lineNumbersSel = readNums . getC "+nm" $ argsC
                 argCs = catMaybes (fmap (readMaybeECG l) . getC "+a" $ argsC)
                 argCBs = unwords . getC "+b" $ argsC -- If you use the parenthese with +b ... -b then consider also using the quotation marks for the whole algebraic constraint. At the moment though it is still not working properly for parentheses functionality. The issue should be fixed in the further releases.
                 permutationsType = bTransform2Perms . getB "+P" $ argsB
@@ -493,6 +506,7 @@ argsProcessing writingSystem allophones arrCharClassification segmentRules basic
                 , codesave
                 , concurrently
                 , basiclineoption
+                , lineNumbersSel
                 , variants1
                 )
 
@@ -537,6 +551,7 @@ processingF selFun writingSystem allophones arrCharClassification segmentRules b
                                                             , codesave
                                                             , concurrently
                                                             , basiclineoption
+                                                            , lineNumbersSel
                                                             , variants1
                                                             ) ->
         generalF
@@ -566,6 +581,7 @@ processingF selFun writingSystem allophones arrCharClassification segmentRules b
             (filesave, codesave)
             concurrently
             basiclineoption
+            lineNumbersSel
             variants1
             >> return ()
 {-# INLINE processingF #-}
@@ -575,7 +591,7 @@ PhLADiPreLiO constraints. For more information, see:
 https://oleksandr-zhabenko.github.io/uk/rhythmicity/PhLADiPreLiO.Eng.21.html#constraints
 -}
 cSpecs :: CLSpecifications
-cSpecs = zip ["+a", "+b", "+l2", "+ln"] . cycle $ [-1]
+cSpecs = zip ["+a", "+b", "+l2", "+ln", "+nm"] . cycle $ [-1]
 
 bSpecs :: CLSpecifications
 bSpecs =
