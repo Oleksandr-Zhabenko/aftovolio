@@ -56,3 +56,7 @@
 
 * Seventh version. Added new command line argument group +nm ... -nm and changed the arity of the main functions. These arguments are the line numbers of the sorted Aftovolio data to be displayed in the modes except tests and file appending.
 
+## 0.7.1.0 -- 2025-02-24
+
+* Seventh version revised A. Changed the name of the one of the Main.hs files so that to avoid duplications on Stackage. Added possibility to filter out the music information in the text in the music mode using "-m" command line argument for unconcatUkr executable.
+

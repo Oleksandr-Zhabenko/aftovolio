@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               aftovolio
-version:            0.7.0.0
+version:            0.7.1.0
 
 -- A short (one-line) description of the package.
 synopsis:           An AFTOVolio implementation for creating texts with special phonetic / prosodic properties.
@@ -45,7 +45,7 @@ executable aftovolioUkr
     default-language: Haskell2010
 
 executable unconcatUkr2
-  main-is:             Main.hs
+  main-is:             UnconcatUkr.hs
   other-modules:       Aftovolio.Ukrainian.ReverseConcatenations
   other-extensions:    BangPatterns, NoImplicitPrelude, StrictData
   build-depends:       base >=4.13 && <5, mmsyn2-array ==0.3.1.1, intermediate-structures == 0.1.2.0
