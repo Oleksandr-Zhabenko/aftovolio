@@ -113,9 +113,9 @@ We conclude that for the whole set of expediently organized texts the existence 
 
 ## Ability to use your own durations of representations of sounds or phonetic phenomena
 
-The programs offer four different sets of phonetic representations by default but it is possible to set your own durations. To do this, specify them as numbers of type 'Word8' (that can be obtained from the 'Double' values from the convex hull envelope method above or from some analogous procedure by the function [zippedDouble2Word8](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.General.Datatype3.html#zippedDouble2Word8), see documentation for the [module](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.General.Datatype3.html)) in the file in the order defined as follows:
+The programs offer four different sets of phonetic representations by default but it is possible to set your own durations. To do this, specify them as numbers of type 'Word8' (that can be obtained from the 'Double' values from the convex hull envelope method above or from some analogous procedure by the function [zippedDouble2Word8](https://hackage.haskell.org/package/aftovolio-0.8.0.0/docs/src/Aftovolio.General.Datatype3.html#zippedDouble2Word8), see documentation for the [module](https://hackage.haskell.org/package/aftovolio-0.8.0.0/docs/src/Aftovolio.General.Datatype3.html)) in the file in the order defined as follows:
 
-where the specified values in the list refer to the [phonetic representations](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.Ukrainian.Syllable.html#showS8) from the module Aftovolio.Ukrainian.Syllable. The last column is 8-bit integers (GHC.Int.Int8), which represent these sounds in the new modules.
+where the specified values in the list refer to the [phonetic representations](https://hackage.haskell.org/package/aftovolio-0.8.0.0/docs/src/Aftovolio.Ukrainian.Syllable.html#showS8) from the module Aftovolio.Ukrainian.Syllable. The last column is 8-bit integers (GHC.Int.Int8), which represent these sounds in the new modules.
 
 If you want to specify several such sets (up to 9 inclusive), you can specify '\*' or several such characters from a new line, and then from the next line there will be a new set of values.
 
@@ -375,7 +375,7 @@ See, for example:
  
 as the element with the maximum value (the "-e" command line argument suppresses output of "={digits}" for better readability). The second line is changed because of the last syllable in the first line that is redundant as for the iambic meter.
 
-You can easily paste the =133 group into the text in many editors or on the command line directly.
+You can easily paste the =133 group into thethe last one groups since the version 0.8.0.0 text in many editors or on the command line directly.
 
 ## Conclusions
 
@@ -439,7 +439,7 @@ The second argument greater or equal to 10 takes effect only if the meter consis
 
 - +di   — if present implies the "differentiation" mode of computation for the comparing options with the line in +l2\.\.\.-l2 or +ln\.\.\.-ln groups of command line arguments. Is useful mostly in case of the line to compare with has approximately the same number of syllables as the option lines.
 
-- -e   — if present suppresses the printing of "={digits}" in the line option to the screen. Is used for better readability, often with +di.
+- -e   — if present suppresses the printing of "={digits}" and \"\_{digits}\" (the last one groups since the version 0.8.0.0) in the line option to the screen. Is used for better readability, often with +di.
 
 - +q   — if present with +l2 \.\.\. -l2 group of arguments then the next argument is a power of 10 which the distance between line option and the predefined line is quoted by. The default one is 0 (that means no change). You can specify not less than 0 and not greater than 4. Otherwise, these limit numbers are used instead. The greater value here leads to more groupped options output.
 
@@ -447,10 +447,10 @@ The second argument greater or equal to 10 takes effect only if the meter consis
 
 - +r   — afterwards are several unique digits not greater than 8 in the descending order — the first one is the length of the group of syllables to be considered as a period, the rest — positions of the maximums and minimums. Example: "543" means that the line is split into groups of 5 syllables starting from the beginning, then the positions of the most maximum (4 = 5 - 1) and the next (smaller) maximum (3 = 4 - 1). If there are no duplicated values then the lowest possible value here is 0, that corresponds to the lowest minimum. If there are duplicates then the lowest value here is the number of the groups of duplicates, e. g. in the sequence 1,6,3,3,4,4,5 that is one group there are two groups of duplicates — with 3 and 4 — and, therefore, the corresponding data after +r should be 7\.\.\.2. The values less than the lowest minimum are neglected.
 
-- +c   — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.8.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that theee corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
+- +c   — see explanation at [the link](https://hackage.haskell.org/package/rhythmic-sequences-0.8.0.0/docs/src/Rhythmicity.MarkerSeqs.html#HashCorrections). Some preliminary tests show that these corrections influence the result but not drastically, they can lead to changes in groupping and order, but mostly leave the structure similar. This shows that the algorithms used are more stable for such changes.
 
 - -t   — and afterwards the number in the range [0..179]  (with some exceptions) showing the test for 'smoothness' (to be more accurate - absence or presence of some irregularities that influences the prosody) to be run - you can see a list of possible values for the parameter here at the link:
-[link1](https://hackage.haskell.org/package/aftovolio-0.6.2.0/docs/src/Aftovolio.Tests.html#sel). For ideas of actual usage of the tests, see the documentation above.
+[link1](https://hackage.haskell.org/package/aftovolio-0.8.0.0/docs/src/Aftovolio.Tests.html#sel). For ideas of actual usage of the tests, see the documentation above.
 
 - -C   — If specified with +RTS -N -RTS rtsoptions for the multicore computers with -t option then it can speed up the full computation of the all tests using more resources. Uses asynchcronous concurrent threads in computation. This groups (-C and rtsoptions) can be specified in any position as command line groups of arguments. The output is in this case not sorted in the order of 2,3,4,5,6,7, but can vary depending on your CPU configurations and states and / or some other factors.
 

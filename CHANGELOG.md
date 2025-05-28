@@ -60,3 +60,6 @@
 
 * Seventh version revised A. Changed the name of the one of the Main.hs files so that to avoid duplications on Stackage. Added possibility to filter out the music information in the text in the music mode using "-m" command line argument for unconcatUkr executable.
 
+## 0.8.0.0 -- 2025-05-28
+
+* Eighth version. Fixed issue with printing of the output for many cases related to formatting of the lines for the second column. Refactored Aftovolio.Halflsplit module, added new funcions to ease reading and testing of the code. Changed the behaviour of -e command line option, so that now it suppresses printing all music mode notation in the form of '={digits}' or '_{digits}'. 

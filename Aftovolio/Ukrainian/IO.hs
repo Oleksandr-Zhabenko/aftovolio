@@ -24,6 +24,7 @@ import Data.Char (isDigit, isSpace, toLower)
 import Data.Foldable (mapM_)
 import Data.List hiding (foldr, null)
 import qualified Data.List as L (null)
+import Data.Lists.FLines (newLineEnding)
 import Data.Maybe (fromJust, fromMaybe, isNothing)
 import Data.MinMax1
 import Data.Ord (Down (..), comparing)
@@ -263,7 +264,7 @@ instance Show AftovolioUkr where
             `mappend` " "
             `mappend` xs
             `mappend` "  "
-            `mappend` showWithSpaces 4 i
+            `mappend` showWithSpaces 6 i -- changed for +x command line option
 
 countSyll :: String -> Int
 countSyll xs =
@@ -298,14 +299,14 @@ outputSel :: AftovolioUkr -> Int -> String
 outputSel (S x1 y1 ts) code
     | code < 0 = []
     | code == 1 || code == 11 || code == 16 =
-        intercalate " " [show x1, ts] `mappend` "\n"
+        intercalate " " [show x1, ts] `mappend` newLineEnding
     | code == 2 || code == 12 || code == 17 =
-        intercalate " " [show y1, ts] `mappend` "\n"
+        intercalate " " [show y1, ts] `mappend` newLineEnding
     | code == 3 || code == 13 || code == 18 =
-        intercalate " " [show x1, ts, show y1] `mappend` "\n"
+        intercalate " " [show x1, ts, show y1] `mappend` newLineEnding
     | code == 4 || code == 14 || code == 19 =
-        intercalate " " [show x1, show y1] `mappend` "\n"
-    | otherwise = ts `mappend` "\n"
+        intercalate " " [show x1, show y1] `mappend` newLineEnding
+    | otherwise = ts `mappend` newLineEnding
 
 parseLineNumber :: Int -> IO Int
 parseLineNumber l1 = do
@@ -458,11 +459,11 @@ testsOutput concurrently syllN filtering f ldc syllableDurationsDs numTest unive
                         `mappend` showFFloat (Just 3) (100 * fromIntegral mx / fromIntegral m) "%"
                         `mappend` ( if rem numTest 10 >= 4
                                         then
-                                            ( "\n"
+                                            ( newLineEnding
                                                 `mappend` (if filtering then removeChangesOfDurations else id) min1
-                                                `mappend` "\n"
+                                                `mappend` newLineEnding
                                                 `mappend` (if filtering then removeChangesOfDurations else id) max1
-                                                `mappend` "\n"
+                                                `mappend` newLineEnding
                                             )
                                         else ""
                                   )
@@ -491,9 +492,9 @@ outputWithFile ::
     IO ()
 outputWithFile selStr compards sRepresent file syllableDurationsDs code grps k fs num
     | mBool && code >= 10 && code <= 19 && grps == 2 =
-        putStrLn (mconcat [textP, "\n", breaks, "\n", show rs])
+        putStrLn (mconcat [textP, newLineEnding, breaks, newLineEnding, show rs])
             >> appendF
-                ( (if code >= 15 then mconcat [show rs, "\n", breaks, "\n"] else "")
+                ( (if code >= 15 then mconcat [show rs, newLineEnding, breaks, newLineEnding] else "")
                     `mappend` outputS
                 )
     | otherwise = appendF outputS
