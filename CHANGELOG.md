@@ -62,4 +62,5 @@
 
 ## 0.8.0.0 -- 2025-05-28
 
-* Eighth version. Fixed issue with printing of the output for many cases related to formatting of the lines for the second column. Refactored Aftovolio.Halflsplit module, added new funcions to ease reading and testing of the code. Changed the behaviour of -e command line option, so that now it suppresses printing all music mode notation in the form of '={digits}' or '_{digits}'. 
+* Eighth version. Fixed an issue with printing the output in many cases related to the formatting of lines in the second column. Refactored the Aftovolio.Halfsplit module and added new functions to improve code readability and facilitate testing. Changed the behaviour of the -e command-line option so that it now suppresses the printing of all music mode notations in the form ={digits} or _{digits}.
+
